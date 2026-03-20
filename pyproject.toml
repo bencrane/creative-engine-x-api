@@ -1,0 +1,11 @@
+[project]
+name = "creative-engine-x-api"
+version = "0.1.0"
+description = "Creative asset pipeline service"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.34.0",
+    "httpx>=0.28.0",
+    "pydantic-settings>=2.7.0",
+]
