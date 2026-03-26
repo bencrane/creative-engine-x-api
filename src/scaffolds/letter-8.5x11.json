@@ -1,0 +1,134 @@
+{
+  "slug": "letter-8.5x11",
+  "displayName": "Letter 8.5×11 (Standard)",
+  "format": "letter",
+  "size": "8.5x11",
+  "plan": "any",
+  "figma": {
+    "fileKey": "WS8RDic5GCof4sPPyRykax",
+    "htmlScaffold": "letter-8.5x11.html"
+  },
+  "dimensions": {
+    "trimWidth": 8.5,
+    "trimHeight": 11,
+    "fileWidth": 8.5,
+    "fileHeight": 11,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "clearSpace",
+    "clearSpace": 0.0625
+  },
+  "safeZone": null,
+  "envelope": {
+    "type": "#10 double-window",
+    "usedForSheets": "1-6",
+    "flatEnvelopeForSheets": "7-60"
+  },
+  "pages": {
+    "min": 1,
+    "max": 60,
+    "extraPostageAfter": 6
+  },
+  "surfaces": [
+    {
+      "id": "page1",
+      "label": "Page 1",
+      "zones": [
+        {
+          "id": "envelope-window-return",
+          "type": "reserved",
+          "label": "Envelope Window — Return Address",
+          "rule": "This area is visible through the top envelope window. Place your logo or return address here.",
+          "anchor": "top-left",
+          "position": { "fromLeft": 0.63, "fromTop": 0.5 },
+          "size": { "width": 3.25, "height": 0.875 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "envelope-window-recipient",
+          "type": "reserved",
+          "label": "Envelope Window — Recipient Address",
+          "rule": "This area is visible through the bottom envelope window. Overlaps with the address block printed by Lob.",
+          "anchor": "top-left",
+          "position": { "fromLeft": 0.63, "fromTop": 1.71 },
+          "size": { "width": 4, "height": 1 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "address-block",
+          "type": "forbidden",
+          "label": "Address Block",
+          "rule": "No design content allowed. Lob prints the recipient address here. This area must remain white.",
+          "anchor": "top-left",
+          "position": { "fromLeft": 0.6, "fromTop": 0.84 },
+          "size": { "width": 3.15, "height": 2 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "qr-code-zone",
+          "type": "forbidden",
+          "label": "QR Code Zone",
+          "rule": "Lob prints a white 0.5\" box with a QR code here for mail piece tracking. Do not design into this corner.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.087, "fromBottom": 0.087 },
+          "size": { "width": 0.5, "height": 0.5 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "sequence-id",
+          "type": "forbidden",
+          "label": "Sequence ID Zone",
+          "rule": "Lob prints a machine-readable sequence identifier here. Do not design into this area.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.3, "fromBottom": 2.2375 },
+          "size": { "width": 1.45, "height": 0.09 },
+          "relativeTo": "page"
+        }
+      ],
+      "llmPrompt": "You are designing PAGE 1 of a standard 8.5×11\" letter.\n\nCanvas: 8.5\" wide × 11\" tall. NO bleed — there is a 1/16\" (0.0625\") clear space border where no content can appear. Letters cannot have edge-to-edge color.\n\nZone restrictions on Page 1:\n- ADDRESS BLOCK: A 3.15\" × 2\" rectangle at 0.6\" from left, 0.84\" from top must be COMPLETELY WHITE. Lob prints the recipient address here.\n- ENVELOPE WINDOW (return): A 3.25\" × 0.875\" area at 0.63\" from left, 0.5\" from top is visible through the top envelope window. Place your logo or return address here.\n- ENVELOPE WINDOW (recipient): A 4\" × 1\" area at 0.63\" from left, 1.71\" from top is visible through the bottom envelope window. This overlaps with the address block.\n- QR CODE: A 0.5\" × 0.5\" white box at 0.087\" from the left and bottom edges. Lob prints a tracking QR code here. Do not design into this corner.\n- SEQUENCE ID: A 1.45\" × 0.09\" strip at 0.3\" from left, 2.2375\" from bottom. Machine-readable production tracking.\n\nDesign tips:\n- The top-left quadrant is heavily reserved — design your main content in the right half and lower portion of the page.\n- Letters go in #10 double-window envelopes (1-6 sheets) or flat envelopes (7-60 sheets).\n- B&W or color, single or double-sided.\n- Merge variables like {{name}} can be used anywhere outside reserved zones."
+    },
+    {
+      "id": "pageN",
+      "label": "Subsequent Pages (2+)",
+      "zones": [
+        {
+          "id": "qr-code-zone",
+          "type": "forbidden",
+          "label": "QR Code Zone",
+          "rule": "Lob prints a white 0.5\" box with a QR code here for mail piece tracking. Do not design into this corner.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.087, "fromBottom": 0.087 },
+          "size": { "width": 0.5, "height": 0.5 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "sequence-id",
+          "type": "forbidden",
+          "label": "Sequence ID Zone",
+          "rule": "Lob prints a machine-readable sequence identifier here. Do not design into this area.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.3, "fromBottom": 2.2375 },
+          "size": { "width": 1.45, "height": 0.09 },
+          "relativeTo": "page"
+        }
+      ],
+      "llmPrompt": "You are designing a SUBSEQUENT PAGE (page 2+) of a standard 8.5×11\" letter.\n\nCanvas: 8.5\" wide × 11\" tall. NO bleed — there is a 1/16\" (0.0625\") clear space border where no content can appear. Letters cannot have edge-to-edge color.\n\nZone restrictions:\n- QR CODE: A 0.5\" × 0.5\" white box at 0.087\" from the left and bottom edges on every page that has content. Do not design into this corner.\n- SEQUENCE ID: A 1.45\" × 0.09\" strip at 0.3\" from left, 2.2375\" from bottom.\n\nDesign tips:\n- Subsequent pages have much more usable space than page 1 — only the bottom-left corner is restricted.\n- Maintain consistent margins and typography with page 1.\n- Merge variables like {{name}} can be used anywhere outside reserved zones."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK",
+    "colorOptions": ["bw", "color"],
+    "sidedOptions": ["single", "double"]
+  },
+  "notes": [
+    "Standard letter — available on all plans.",
+    "1-6 sheets: #10 double-window envelope. 7-60 sheets: flat envelope.",
+    "Over 6 sheets incurs extra postage.",
+    "No edge-to-edge printing — 1/16\" clear space on all sides."
+  ]
+}

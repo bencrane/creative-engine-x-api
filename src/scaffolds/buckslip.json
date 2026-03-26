@@ -1,0 +1,57 @@
+{
+  "slug": "buckslip",
+  "displayName": "Buckslip 8.5×3.5",
+  "format": "buckslip",
+  "size": "8.5x3.5",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "813wa8IuLYf0kleraFSGju",
+    "htmlScaffold": "buckslip.html"
+  },
+  "dimensions": {
+    "trimWidth": 8.5,
+    "trimHeight": 3.5,
+    "fileWidth": 8.75,
+    "fileHeight": 3.75,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "bleed",
+    "bleed": 0.125
+  },
+  "safeZone": {
+    "inset": 0.125,
+    "measuredFrom": "trim",
+    "safeWidth": 8.25,
+    "safeHeight": 3.25
+  },
+  "surfaces": [
+    {
+      "id": "front",
+      "label": "Front",
+      "zones": [],
+      "llmPrompt": "You are designing the FRONT of a buckslip (8.5\" × 3.5\" trim).\n\nCanvas: 8.75\" wide × 3.75\" tall (includes 0.125\" bleed on all sides).\nTrim: 8.5\" × 3.5\" — everything outside this is cut off.\nSafe zone: 8.25\" × 3.25\" (0.125\" inset from trim) — ALL text and critical content must stay inside.\n\nNo restricted zones on the front — it is fully customizable.\n\nDesign tips:\n- Buckslips are letter inserts — they go inside #10 envelopes with 8.5×11\" letters.\n- PDF format only (no HTML rendering).\n- No merge variables — this is a static design.\n- Extend background colors into the bleed to avoid white edges.\n- Stock options: 80# Text or Cover, Gloss or Matte.\n- Think of this as a small flyer or coupon insert."
+    },
+    {
+      "id": "back",
+      "label": "Back",
+      "zones": [],
+      "llmPrompt": "You are designing the BACK of a buckslip (8.5\" × 3.5\" trim).\n\nCanvas: 8.75\" wide × 3.75\" tall (includes 0.125\" bleed on all sides).\nTrim: 8.5\" × 3.5\".\nSafe zone: 8.25\" × 3.25\" (0.125\" inset from trim).\n\nNo restricted zones on the back — fully customizable.\n\nDesign tips:\n- The back is often left blank or used for terms/conditions, a secondary offer, or additional branding.\n- PDF format only. No merge variables.\n- Extend backgrounds into bleed."
+    }
+  ],
+  "acceptedFormats": ["pdf"],
+  "mergeVariables": false,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK",
+    "stock": "80# Text or Cover, Gloss or Matte"
+  },
+  "notes": [
+    "Enterprise only.",
+    "Letter insert only — included with 8.5×11\" letters via Campaigns API.",
+    "PDF format only (no HTML).",
+    "No merge variables.",
+    "8.75\" × 3.75\" is the BLEED size — trim is 8.5\" × 3.5\"."
+  ]
+}

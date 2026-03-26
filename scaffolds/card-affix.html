@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Card Affix - Base Scaffold</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e8e8; padding: 40px; font-family: -apple-system, sans-serif; }
+  h1 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .label { font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; }
+  .surfaces { display: flex; gap: 40px; flex-wrap: wrap; }
+  .surface-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+  .enterprise-badge { display: inline-block; background: #6B21A8; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+
+  /* Vertical: 2.125" x 3.375" = 204px x 324px */
+  .surface-v {
+    width: 204px;
+    height: 324px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+  }
+
+  /* Horizontal: 3.375" x 2.125" = 324px x 204px */
+  .surface-h {
+    width: 324px;
+    height: 204px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+  }
+
+  .page-boundary {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid #333;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 11;
+  }
+  .page-label {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-size: 7px;
+    color: #333;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+  }
+
+  /* Safe zone: 0.125" inset = 12px from all edges */
+  .safe-zone-v {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    border: 1.5px dashed #22aa22;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 12;
+  }
+  .safe-zone-h {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    border: 1.5px dashed #22aa22;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 12;
+  }
+  .safe-zone-label {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 7px;
+    color: #22aa22;
+    font-weight: 600;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+    white-space: nowrap;
+  }
+
+  .design-area-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    color: #bbb;
+    z-index: 5;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .dims { font-size: 10px; color: #888; margin-top: 4px; }
+  .note { font-size: 11px; color: #666; margin-top: 8px; max-width: 700px; line-height: 1.4; }
+  .orientation-group { margin-bottom: 24px; }
+  .orientation-title { font-size: 14px; color: #444; font-weight: 600; margin-bottom: 12px; }
+
+  .legend {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #555;
+  }
+  .legend-swatch {
+    width: 16px;
+    height: 12px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+  <h1>Card Affix — Base Scaffold <span class="enterprise-badge">ENTERPRISE</span></h1>
+  <h2>Physical card affixed to letter &nbsp;|&nbsp; PDF only &nbsp;|&nbsp; No merge variables &nbsp;|&nbsp; Min order: 10,000 cards &nbsp;|&nbsp; 1/8" rounded corners</h2>
+
+  <div class="orientation-group">
+    <div class="orientation-title">Vertical Orientation (2.125" x 3.375")</div>
+    <div class="surfaces">
+      <div class="surface-wrapper">
+        <div class="label">FRONT</div>
+        <div class="surface-v">
+          <div class="page-boundary"></div>
+          <div class="page-label">2.125" x 3.375"</div>
+          <div class="safe-zone-v"></div>
+          <div class="safe-zone-label">1.875" x 3.125" Safe Zone</div>
+          <div class="design-area-label">CARD<br>Front</div>
+        </div>
+        <div class="dims">Vertical — standard card orientation</div>
+      </div>
+      <div class="surface-wrapper">
+        <div class="label">BACK</div>
+        <div class="surface-v">
+          <div class="page-boundary"></div>
+          <div class="page-label">2.125" x 3.375"</div>
+          <div class="safe-zone-v"></div>
+          <div class="safe-zone-label">1.875" x 3.125" Safe Zone</div>
+          <div class="design-area-label">CARD<br>Back</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="orientation-group">
+    <div class="orientation-title">Horizontal Orientation (3.375" x 2.125")</div>
+    <div class="surfaces">
+      <div class="surface-wrapper">
+        <div class="label">FRONT</div>
+        <div class="surface-h">
+          <div class="page-boundary"></div>
+          <div class="page-label">3.375" x 2.125"</div>
+          <div class="safe-zone-h"></div>
+          <div class="safe-zone-label">3.125" x 1.875" Safe Zone</div>
+          <div class="design-area-label">CARD — Front (horizontal)</div>
+        </div>
+        <div class="dims">Horizontal — landscape orientation</div>
+      </div>
+      <div class="surface-wrapper">
+        <div class="label">BACK</div>
+        <div class="surface-h">
+          <div class="page-boundary"></div>
+          <div class="page-label">3.375" x 2.125"</div>
+          <div class="safe-zone-h"></div>
+          <div class="safe-zone-label">3.125" x 1.875" Safe Zone</div>
+          <div class="design-area-label">CARD — Back (horizontal)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">NOTE: Cards are affixed to 8.5x11" letters. PDF format only. No merge variables. Minimum order of 10,000 cards required. Color can be printed edge-to-edge within the trim size. Any text/barcodes/content should be kept within the safe zone. Artwork can be printed on front and back of card. Cards have 1/8" rounded corners.</div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 1.5px solid #333; border-radius: 3px;"></div>
+      Trim Edge (1/8" rounded corners)
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 1.5px dashed #22aa22;"></div>
+      Safe Zone (0.125" inset)
+    </div>
+  </div>
+</body>
+</html>

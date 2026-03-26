@@ -1,0 +1,115 @@
+{
+  "slug": "snappack-8.5x11",
+  "displayName": "Snap Pack 8.5×11",
+  "format": "snappack",
+  "size": "8.5x11",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "JYVeNFPdnzX8PqNfuwJSwK",
+    "htmlScaffold": "snappack-8.5x11.html"
+  },
+  "dimensions": {
+    "trimWidth": 8.5,
+    "trimHeight": 11,
+    "fileWidth": 8.5,
+    "fileHeight": 11,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "noPrintBorder",
+    "noPrintBorder": 0.5,
+    "description": "No bleed. 0.5\" no-print border on all sides. Nothing prints in this area."
+  },
+  "perforation": {
+    "width": 7.5,
+    "height": 10,
+    "insetFromEdge": 0.5,
+    "description": "Perforated rectangle inside the no-print border. Recipients tear along these edges to open."
+  },
+  "safeZone": {
+    "inset": 0.125,
+    "measuredFrom": "perforation",
+    "safeWidth": 7.25,
+    "safeHeight": 9.75
+  },
+  "finishedSize": {
+    "width": 8.5,
+    "height": 5.5,
+    "unit": "inches"
+  },
+  "foldLines": [
+    {
+      "id": "center-fold",
+      "orientation": "horizontal",
+      "position": { "fromTop": 5.5 },
+      "label": "Center fold — 5.5\" from top",
+      "relativeTo": "file"
+    }
+  ],
+  "panels": [
+    { "id": "top", "label": "Top Panel", "width": 8.5, "height": 5.5, "fromTop": 0 },
+    { "id": "bottom", "label": "Bottom Panel", "width": 8.5, "height": 5.5, "fromTop": 5.5 }
+  ],
+  "surfaces": [
+    {
+      "id": "outside",
+      "label": "Outside",
+      "zones": [
+        {
+          "id": "no-print-border",
+          "type": "forbidden",
+          "label": "No-Print Border",
+          "rule": "0.5\" border around all edges. Nothing can be printed in this area.",
+          "anchor": "all-edges",
+          "inset": 0,
+          "borderWidth": 0.5,
+          "relativeTo": "file"
+        },
+        {
+          "id": "ink-free-zone",
+          "type": "forbidden",
+          "label": "Ink-Free Zone (Address + Postage)",
+          "rule": "No ink allowed. Must be completely white/blank. Reserved for recipient address and postage indicia.",
+          "anchor": "custom",
+          "position": { "fromRight": 0.625, "fromTop": 2.975 },
+          "size": { "width": 4, "height": 2.375 },
+          "relativeTo": "file",
+          "note": "Top panel, 0.15\" from fold, 0.125\" from right perf edge"
+        }
+      ],
+      "llmPrompt": "You are designing the OUTSIDE of an 8.5×11\" snap pack.\n\nCanvas: 8.5\" wide × 11\" tall. NO BLEED — this is a no-bleed format.\n\nIMPORTANT: There is a 0.5\" NO-PRINT BORDER on all four sides. Nothing can be printed in this area. Your printable area starts 0.5\" inward from each edge.\n\nPerforated area: 7.5\" × 10\" (inside the no-print border). Recipients tear along these perforations to open.\nSafe zone: 7.25\" × 9.75\" (0.125\" inset from perforation) — all text and critical content must stay inside this.\n\nThe piece folds at the center (5.5\" from top), creating two panels.\n\nZone restrictions:\n- NO-PRINT BORDER: 0.5\" on all sides — absolutely nothing prints here.\n- INK-FREE ZONE: A 4\" × 2.375\" rectangle on the top panel (outside), positioned 0.125\" from right perf edge and 0.15\" above the fold. Must be COMPLETELY WHITE for recipient address and postage.\n\nDesign tips:\n- The outside top panel is the address side — design around the ink-free zone.\n- The outside bottom panel is fully customizable (within the no-print border).\n- Do NOT use edge-to-edge backgrounds — there will always be a white border.\n- This format is great for official notices, healthcare (HIPAA-compliant interior), and financial communications."
+    },
+    {
+      "id": "inside",
+      "label": "Inside",
+      "zones": [
+        {
+          "id": "no-print-border",
+          "type": "forbidden",
+          "label": "No-Print Border",
+          "rule": "0.5\" border around all edges. Nothing can be printed in this area.",
+          "anchor": "all-edges",
+          "inset": 0,
+          "borderWidth": 0.5,
+          "relativeTo": "file"
+        }
+      ],
+      "llmPrompt": "You are designing the INSIDE of an 8.5×11\" snap pack.\n\nCanvas: 8.5\" wide × 11\" tall. NO BLEED.\n\n0.5\" NO-PRINT BORDER on all sides. Printable area starts 0.5\" inward.\nPerforated area: 7.5\" × 10\".\nSafe zone: 7.25\" × 9.75\" (0.125\" inset from perforation).\n\nThe piece folds at 5.5\". The INSIDE PANEL ROTATES 180° during production — design upright and the printer will handle the rotation.\n\nZone restrictions:\n- NO-PRINT BORDER: 0.5\" on all sides.\n\nDesign tips:\n- The inside is HIPAA-compliant — it's sealed until the recipient tears it open. Use this for sensitive information (medical, financial, legal).\n- Both inside panels (top and bottom) are fully customizable within the safe zone.\n- Design upright — the inside panel rotates 180° during production.\n- The fold crease runs horizontally at the center — avoid critical text directly on it.\n- Merge variables like {{name}}, {{account_number}} can be used anywhere in the safe zone.\n- Remember: no edge-to-edge color — the 0.5\" white border is always visible."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf", "png", "jpeg"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK"
+  },
+  "notes": [
+    "Enterprise only.",
+    "NO BLEED format — 0.5\" no-print border, NOT 0.125\" bleed.",
+    "Pressure-sealed with perforated sides — recipients tear open.",
+    "Interior is HIPAA-compliant (sealed until opened).",
+    "Inside panel rotates 180° during production — design upright.",
+    "High open rates due to the sealed format."
+  ]
+}

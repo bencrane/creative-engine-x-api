@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Booklet 8.375x5.375 - Base Scaffold</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e8e8; padding: 40px; font-family: -apple-system, sans-serif; }
+  h1 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .label { font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; }
+  .surfaces { display: flex; gap: 40px; flex-wrap: wrap; }
+  .surface-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+  .enterprise-badge { display: inline-block; background: #6B21A8; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+
+  /* 8.375" x 5.375" = 804px x 516px */
+  .surface {
+    width: 804px;
+    height: 516px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #ccc;
+  }
+
+  .page-boundary {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid #333;
+    pointer-events: none;
+    z-index: 11;
+  }
+  .page-label {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-size: 8px;
+    color: #333;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+  }
+
+  /* Spine indicator on left for cover */
+  .spine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 12px;
+    background: rgba(100, 100, 100, 0.15);
+    border-right: 1.5px dashed #666;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .spine-label {
+    font-size: 7px;
+    color: #666;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+  }
+
+  .design-area-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: #bbb;
+    z-index: 5;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .dims { font-size: 10px; color: #888; margin-top: 4px; }
+  .note { font-size: 11px; color: #666; margin-top: 8px; max-width: 804px; line-height: 1.4; }
+  .legend { margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+  .legend-swatch { width: 16px; height: 12px; border-radius: 2px; }
+</style>
+</head>
+<body>
+  <h1>Booklet 8.375x5.375" (Digest) — Base Scaffold <span class="enterprise-badge">ENTERPRISE</span></h1>
+  <h2>Page: 8.375" x 5.375" &nbsp;|&nbsp; Saddle-stitched &nbsp;|&nbsp; 8-32 pages (increments of 4) &nbsp;|&nbsp; Offset printed &nbsp;|&nbsp; NOT personalizable</h2>
+
+  <div class="surfaces">
+    <div class="surface-wrapper">
+      <div class="label">COVER (front)</div>
+      <div class="surface">
+        <div class="page-boundary"></div>
+        <div class="page-label">8.375" x 5.375"</div>
+        <div class="spine"><span class="spine-label">SPINE</span></div>
+        <div class="design-area-label">
+          FRONT COVER
+        </div>
+      </div>
+      <div class="dims">2,513 x 1,613 px @ 300 DPI &nbsp;|&nbsp; 60# Gloss Text stock</div>
+    </div>
+
+    <div class="surface-wrapper">
+      <div class="label">INTERIOR PAGE (example spread)</div>
+      <div class="surface">
+        <div class="page-boundary"></div>
+        <div class="page-label">INTERIOR PAGE — 8.375" x 5.375"</div>
+        <div class="spine"><span class="spine-label">SPINE</span></div>
+        <div class="design-area-label">
+          Interior Page<br><span style="font-size: 12px;">8, 12, 16, 20, 24, 28, or 32 pages</span>
+        </div>
+      </div>
+      <div class="dims">Page counts must be in increments of 4</div>
+    </div>
+  </div>
+
+  <div class="note">NOTE: Digest booklets are currently NOT personalizable (no merge variables). Offset printed. A 9x6" digitally printed version with personalization is coming soon.</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="border: 1.5px solid #333;"></div>Page Edge</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: rgba(100,100,100,0.15); border-right: 1.5px dashed #666;"></div>Spine</div>
+  </div>
+</body>
+</html>

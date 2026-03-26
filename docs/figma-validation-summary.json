@@ -1,0 +1,24 @@
+{
+  "totalScaffolds": 14,
+  "totalChecks": 94,
+  "ok": 94,
+  "warnings": 0,
+  "mismatches": 0,
+  "tolerance": 0.01,
+  "scaffolds": {
+    "postcard-4x6": "pass",
+    "postcard-5x7": "pass",
+    "postcard-6x9": "pass",
+    "postcard-6x11": "pass",
+    "letter-8.5x11": "pass",
+    "letter-8.5x14": "pass",
+    "card-affix": "pass",
+    "selfmailer-6x18-bifold": "pass",
+    "selfmailer-12x9-bifold": "pass",
+    "selfmailer-11x9-bifold": "pass",
+    "selfmailer-17.75x9-trifold": "pass",
+    "snappack-8.5x11": "pass",
+    "booklet-8.375x5.375": "pass",
+    "buckslip": "pass"
+  }
+}

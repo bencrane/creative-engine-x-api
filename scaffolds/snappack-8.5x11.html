@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Snap Pack 8.5x11 - Base Scaffold</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e8e8; padding: 40px; font-family: -apple-system, sans-serif; }
+  h1 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .label { font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; }
+  .surfaces { display: flex; gap: 40px; flex-wrap: wrap; }
+  .surface-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+  .enterprise-badge { display: inline-block; background: #6B21A8; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+  .hipaa-badge { display: inline-block; background: #059669; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+
+  /*
+   * Snap Pack 8.5" x 11" — NO-BLEED FORMAT
+   *
+   * Final Trim Size: 8.5" x 11" = 816px x 1056px at 96dpi
+   * No-Print Zone:   0.5" border around entire piece = 48px
+   * Perf Size:        7.5" x 10" = 720px x 960px (at 48px inset from file edge)
+   * Safety Size:      7.25" x 9.75" = 696px x 936px (0.125" inset from perf = 12px)
+   *                   => 60px from file edge (48px no-print + 12px safety margin)
+   * Fold:             Center at 5.5" = 528px from top
+   * Panel Size:       8.5"W x 5.5"H per panel (two panels, folded at center)
+   *
+   * OUTSIDE only:
+   *   Ink-free zone: 4"W x 2.375"H = 384px x 228px
+   *   Positioned on top panel, 0.15" from fold = ~14px above fold,
+   *   0.125" from right perf edge = 12px from right safety edge
+   */
+
+  /* Both surfaces: 8.5" x 11" = 816px x 1056px — NO bleed added */
+  .surface {
+    width: 816px;
+    height: 1056px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  /* No-print zone: 0.5" = 48px red border around entire piece */
+  .no-print-zone {
+    position: absolute;
+    inset: 0;
+    border: 48px solid rgba(255, 50, 50, 0.15);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .no-print-label {
+    position: absolute;
+    top: 4px;
+    left: 50px;
+    font-size: 8px;
+    color: #cc3333;
+    font-weight: 600;
+    z-index: 15;
+    white-space: nowrap;
+  }
+
+  /* Perf line: at 0.5" in from each edge = 48px = inner edge of no-print zone */
+  .perf-line {
+    position: absolute;
+    top: 48px;
+    left: 48px;
+    right: 48px;
+    bottom: 48px;
+    border: 1.5px dashed #0066cc;
+    pointer-events: none;
+    z-index: 11;
+  }
+  .perf-label {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    font-size: 8px;
+    color: #0066cc;
+    font-weight: 600;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+  }
+
+  /* Safety zone: 0.125" inset from perf = 60px from file edge */
+  .safe-zone {
+    position: absolute;
+    top: 60px;
+    left: 60px;
+    right: 60px;
+    bottom: 60px;
+    border: 1.5px dashed #22aa22;
+    pointer-events: none;
+    z-index: 12;
+  }
+  .safe-label {
+    position: absolute;
+    top: 62px;
+    right: 62px;
+    font-size: 8px;
+    color: #22aa22;
+    font-weight: 600;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+  }
+
+  /* Fold line at center: 5.5" = 528px from top */
+  .fold-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 528px;
+    border-top: 2px dashed #ff6600;
+    z-index: 14;
+  }
+  .fold-label {
+    position: absolute;
+    top: 530px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: #ff6600;
+    font-weight: 600;
+    z-index: 15;
+    background: rgba(255,255,255,0.85);
+    padding: 1px 6px;
+    white-space: nowrap;
+  }
+
+  /* Ink-free zone on outside top panel:
+   * 4"W x 2.375"H = 384px x 228px
+   * 0.125" from right perf edge: right = 48px (perf) + 12px = 60px from file right edge
+   * 0.15" above fold line: bottom = 528px - 14px = 514px => top = 514 - 228 = 286px
+   */
+  .ink-free-zone {
+    position: absolute;
+    width: 384px;
+    height: 228px;
+    right: 60px;
+    top: 286px;
+    background: rgba(220, 50, 50, 0.2);
+    border: 1.5px solid #cc3333;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .ink-free-label { font-size: 10px; color: #cc3333; font-weight: 700; text-align: center; line-height: 1.4; }
+  .ink-free-sublabel { font-size: 8px; color: #cc3333; text-align: center; margin-top: 2px; }
+
+  /* Panel area labels */
+  .panel-label {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 15px;
+    color: #bbb;
+    z-index: 5;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .panel-label-top { top: 240px; }
+  .panel-label-bottom { top: 740px; }
+
+  /* Spec callout inside the surface */
+  .spec-callout {
+    position: absolute;
+    bottom: 62px;
+    left: 62px;
+    font-size: 8px;
+    color: #999;
+    z-index: 5;
+    line-height: 1.5;
+  }
+
+  .dims { font-size: 10px; color: #888; margin-top: 4px; }
+  .note { font-size: 11px; color: #666; margin-top: 8px; max-width: 816px; line-height: 1.5; }
+  .legend { margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+  .legend-swatch { width: 16px; height: 12px; border-radius: 2px; }
+</style>
+</head>
+<body>
+  <h1>Snap Pack 8.5x11" — Base Scaffold <span class="enterprise-badge">ENTERPRISE</span> <span class="hipaa-badge">HIPAA (interior)</span></h1>
+  <h2>Final Trim: 8.5" x 11" &nbsp;|&nbsp; Folded: 8.5" x 5.5" &nbsp;|&nbsp; No-bleed format &nbsp;|&nbsp; Pressure-sealed, perforated sides &nbsp;|&nbsp; High open rates</h2>
+
+  <div class="surfaces">
+
+    <!-- OUTSIDE SURFACE -->
+    <div class="surface-wrapper">
+      <div class="label">OUTSIDE (address side)</div>
+      <div class="surface">
+        <!-- No-print zone: 0.5" red border — no bleed -->
+        <div class="no-print-zone"></div>
+        <div class="no-print-label">NO-PRINT AREA (0.5" around entire piece — no bleed format)</div>
+
+        <!-- Perf line at 48px inset = 7.5" x 10" -->
+        <div class="perf-line"></div>
+        <div class="perf-label">PERF — 7.5" x 10"</div>
+
+        <!-- Safety zone at 60px inset = 7.25" x 9.75" -->
+        <div class="safe-zone"></div>
+        <div class="safe-label">SAFE — 7.25" x 9.75"</div>
+
+        <!-- Fold at center -->
+        <div class="fold-line"></div>
+        <div class="fold-label">FOLD — 5.5" from top (center)</div>
+
+        <!-- Ink-free zone for address, barcode, postage -->
+        <div class="ink-free-zone">
+          <span class="ink-free-label">INK-FREE ZONE<br>Address, Barcode + Postage</span>
+          <span class="ink-free-sublabel">4" x 2.375" &nbsp;|&nbsp; 0.15" from fold, 0.125" from right edge</span>
+        </div>
+
+        <!-- Panel labels -->
+        <div class="panel-label panel-label-top">
+          OUTSIDE — Top Panel<br><span style="font-size: 11px;">8.5"W x 5.5"H</span>
+        </div>
+        <div class="panel-label panel-label-bottom">
+          OUTSIDE — Bottom Panel<br><span style="font-size: 11px;">8.5"W x 5.5"H</span>
+        </div>
+
+        <!-- Spec callout -->
+        <div class="spec-callout">
+          Red region is no print area. This is 0.5" around the entire piece.<br>
+          This is a no-bleed format. Panel size: 8.5"W x 5.5"H.
+        </div>
+      </div>
+      <div class="dims">816px x 1056px (8.5" x 11" at 96dpi) &nbsp;|&nbsp; No bleed &nbsp;|&nbsp; Perf: 7.5" x 10" &nbsp;|&nbsp; Safe: 7.25" x 9.75"</div>
+      <div class="note">Ink-free zone for address, barcode, and postage is required on the outside top panel. No design elements may be placed in the 0.5" no-print border.</div>
+    </div>
+
+    <!-- INSIDE SURFACE -->
+    <div class="surface-wrapper">
+      <div class="label">INSIDE (HIPAA-compliant content area — panel will rotate 180 degrees)</div>
+      <div class="surface">
+        <!-- No-print zone: 0.5" red border — no bleed -->
+        <div class="no-print-zone"></div>
+        <div class="no-print-label">NO-PRINT AREA (0.5" around entire piece — no bleed format)</div>
+
+        <!-- Perf line at 48px inset = 7.5" x 10" -->
+        <div class="perf-line"></div>
+        <div class="perf-label">PERF — 7.5" x 10"</div>
+
+        <!-- Safety zone at 60px inset = 7.25" x 9.75" -->
+        <div class="safe-zone"></div>
+        <div class="safe-label">SAFE — 7.25" x 9.75"</div>
+
+        <!-- Fold at center -->
+        <div class="fold-line"></div>
+        <div class="fold-label">FOLD — 5.5" from top (center)</div>
+
+        <!-- Panel labels -->
+        <div class="panel-label panel-label-top">
+          INSIDE — Top Panel<br><span style="font-size: 11px;">8.5"W x 5.5"H &nbsp;|&nbsp; Inside panel will rotate 180 degrees</span>
+        </div>
+        <div class="panel-label panel-label-bottom">
+          INSIDE — Bottom Panel<br><span style="font-size: 11px;">8.5"W x 5.5"H &nbsp;|&nbsp; Visible after opening</span>
+        </div>
+
+        <!-- Spec callout -->
+        <div class="spec-callout">
+          Inside panel will rotate 180 degrees. Red region is no print area.<br>
+          This is a no-bleed format. Panel size: 8.5"W x 5.5"H.
+        </div>
+      </div>
+      <div class="dims">816px x 1056px (8.5" x 11" at 96dpi) &nbsp;|&nbsp; No bleed &nbsp;|&nbsp; Perf: 7.5" x 10" &nbsp;|&nbsp; Safe: 7.25" x 9.75"</div>
+      <div class="note">Interior content is HIPAA-compliant (sealed). Perforated sides — recipients tear open. Inside panel will rotate 180 degrees. High open rates.</div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background: rgba(255, 50, 50, 0.15); border: 1px solid rgba(255, 50, 50, 0.3);"></div>No-Print Zone (0.5")</div>
+    <div class="legend-item"><div class="legend-swatch" style="border: 1.5px dashed #0066cc;"></div>Perf Line (7.5" x 10")</div>
+    <div class="legend-item"><div class="legend-swatch" style="border: 1.5px dashed #22aa22;"></div>Safe Zone (7.25" x 9.75")</div>
+    <div class="legend-item"><div class="legend-swatch" style="border: 2px dashed #ff6600;"></div>Fold Line (5.5")</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: rgba(220, 50, 50, 0.2); border: 1px solid #cc3333;"></div>Ink-Free Zone (4" x 2.375")</div>
+  </div>
+</body>
+</html>

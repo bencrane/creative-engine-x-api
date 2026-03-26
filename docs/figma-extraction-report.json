@@ -1,0 +1,1848 @@
+{
+  "postcard-4x6": {
+    "slug": "postcard-4x6",
+    "pageName": "Postcard 4x6 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "1:2",
+    "extractedDimensions": {
+      "Trim": {
+        "width": 6.0,
+        "height": 4.0,
+        "unit": "inches"
+      },
+      "File with bleed": {
+        "width": 4.25,
+        "height": 6.25,
+        "unit": "inches"
+      },
+      "File": {
+        "width": 6.25,
+        "height": 4.25,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "front",
+        "label": "Front",
+        "canvas": {
+          "widthPx": 600.0,
+          "heightPx": 408.0,
+          "widthIn": 6.25,
+          "heightIn": 4.2499
+        },
+        "extractedZones": {
+          "file": {
+            "width": 6.25,
+            "height": 4.25,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 6.0,
+            "height": 4.0,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 6.0,
+            "height": 4.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 5.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "back",
+        "label": "Back",
+        "canvas": {
+          "widthPx": 600.0,
+          "heightPx": 408.0,
+          "widthIn": 6.25,
+          "heightIn": 4.2499
+        },
+        "extractedZones": {
+          "free_zone": {
+            "width": 3.2835,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 6.0,
+            "height": 4.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 5.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "File width",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "File height",
+          "expected": 4.25,
+          "actual": 4.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 6,
+          "actual": 6.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 4,
+          "actual": 4.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe width",
+          "expected": 5.875,
+          "actual": 5.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe height",
+          "expected": 3.875,
+          "actual": 3.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas width",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas height",
+          "expected": 4.25,
+          "actual": 4.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas width",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas height",
+          "expected": 4.25,
+          "actual": 4.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "postcard-5x7": {
+    "slug": "postcard-5x7",
+    "pageName": "Postcard 5x7 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "2:2",
+    "extractedDimensions": {
+      "Trim": {
+        "width": 7.0,
+        "height": 5.0,
+        "unit": "inches"
+      },
+      "File with bleed": {
+        "width": 5.25,
+        "height": 7.25,
+        "unit": "inches"
+      },
+      "File": {
+        "width": 7.25,
+        "height": 5.25,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "front",
+        "label": "Front",
+        "canvas": {
+          "widthPx": 696.0,
+          "heightPx": 504.0,
+          "widthIn": 7.25,
+          "heightIn": 5.2499
+        },
+        "extractedZones": {
+          "file": {
+            "width": 7.25,
+            "height": 5.25,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 7.0,
+            "height": 5.0,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 7.0,
+            "height": 5.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 6.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "back",
+        "label": "Back",
+        "canvas": {
+          "widthPx": 696.0,
+          "heightPx": 504.0,
+          "widthIn": 7.25,
+          "heightIn": 5.2499
+        },
+        "extractedZones": {
+          "free_zone": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 7.0,
+            "height": 5.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 6.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "File width",
+          "expected": 7.25,
+          "actual": 7.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "File height",
+          "expected": 5.25,
+          "actual": 5.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 7,
+          "actual": 7.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 5,
+          "actual": 5.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe width",
+          "expected": 6.875,
+          "actual": 6.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe height",
+          "expected": 4.875,
+          "actual": 4.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas width",
+          "expected": 7.25,
+          "actual": 7.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas height",
+          "expected": 5.25,
+          "actual": 5.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas width",
+          "expected": 7.25,
+          "actual": 7.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas height",
+          "expected": 5.25,
+          "actual": 5.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "postcard-6x9": {
+    "slug": "postcard-6x9",
+    "pageName": "Postcard 6x9 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "3:2",
+    "extractedDimensions": {
+      "Trim": {
+        "width": 9.0,
+        "height": 6.0,
+        "unit": "inches"
+      },
+      "File with bleed": {
+        "width": 6.25,
+        "height": 9.25,
+        "unit": "inches"
+      },
+      "File": {
+        "width": 9.25,
+        "height": 6.25,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "front",
+        "label": "Front",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 600.0,
+          "widthIn": 9.2499,
+          "heightIn": 6.25
+        },
+        "extractedZones": {
+          "file": {
+            "width": 9.25,
+            "height": 6.25,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 9.0,
+            "height": 6.0,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 9.0,
+            "height": 6.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 8.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "back",
+        "label": "Back",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 600.0,
+          "widthIn": 9.2499,
+          "heightIn": 6.25
+        },
+        "extractedZones": {
+          "free_zone": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 9.0,
+            "height": 6.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 8.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "File width",
+          "expected": 9.25,
+          "actual": 9.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "File height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 9,
+          "actual": 9.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 6,
+          "actual": 6.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe width",
+          "expected": 8.875,
+          "actual": 8.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe height",
+          "expected": 5.875,
+          "actual": 5.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "postcard-6x11": {
+    "slug": "postcard-6x11",
+    "pageName": "Postcard 6x11 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "4:2",
+    "extractedDimensions": {
+      "Trim": {
+        "width": 11.0,
+        "height": 6.0,
+        "unit": "inches"
+      },
+      "File with bleed": {
+        "width": 6.25,
+        "height": 11.25,
+        "unit": "inches"
+      },
+      "File": {
+        "width": 11.25,
+        "height": 6.25,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "front",
+        "label": "Front",
+        "canvas": {
+          "widthPx": 1080.0,
+          "heightPx": 600.0,
+          "widthIn": 11.25,
+          "heightIn": 6.25
+        },
+        "extractedZones": {
+          "file": {
+            "width": 11.25,
+            "height": 6.25,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 11.0,
+            "height": 6.0,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 11.0,
+            "height": 6.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 10.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "back",
+        "label": "Back",
+        "canvas": {
+          "widthPx": 1080.0,
+          "heightPx": 600.0,
+          "widthIn": 11.25,
+          "heightIn": 6.25
+        },
+        "extractedZones": {
+          "free_zone": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim_line": {
+            "width": 11.0,
+            "height": 6.0,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "value": 0.0625,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 10.875,
+            "unit": "inches"
+          },
+          "inset": {
+            "value": 0.0625,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "File width",
+          "expected": 11.25,
+          "actual": 11.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "File height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 11,
+          "actual": 11.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 6,
+          "actual": 6.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe width",
+          "expected": 10.875,
+          "actual": 10.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe height",
+          "expected": 5.875,
+          "actual": 5.875,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas width",
+          "expected": 11.25,
+          "actual": 11.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas width",
+          "expected": 11.25,
+          "actual": 11.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "letter-8.5x11": {
+    "slug": "letter-8.5x11",
+    "pageName": "Letter 8.5x11 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "5:2",
+    "extractedDimensions": {
+      "Page": {
+        "width": 8.5,
+        "height": 11.0,
+        "unit": "inches"
+      },
+      "Address block": {
+        "width": 3.15,
+        "height": 2.0,
+        "unit": "inches"
+      },
+      "QR zone": {
+        "width": 0.5,
+        "height": 0.5,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "page1",
+        "label": "Page 1",
+        "canvas": {
+          "widthPx": 816.0,
+          "heightPx": 1056.0,
+          "widthIn": 8.5,
+          "heightIn": 11.0
+        },
+        "extractedZones": {
+          "address_block": {
+            "width": 3.15,
+            "height": 2.0,
+            "unit": "inches"
+          },
+          "qr_zone": {
+            "width": 0.5,
+            "height": 0.5,
+            "unit": "inches"
+          },
+          "sequence_id": {
+            "value": 1.45,
+            "unit": "inches"
+          },
+          "page_edge": {
+            "width": 8.5,
+            "height": 11.0,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "Page 1 (page1)",
+          "check": "Canvas width",
+          "expected": 8.5,
+          "actual": 8.5,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Page 1 (page1)",
+          "check": "Canvas height",
+          "expected": 11,
+          "actual": 11.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Page 1 (page1)",
+          "check": "address-block width",
+          "expected": 3.15,
+          "actual": 3.15,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Page 1 (page1)",
+          "check": "address-block height",
+          "expected": 2,
+          "actual": 2.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Page 1 (page1)",
+          "check": "qr-code-zone width",
+          "expected": 0.5,
+          "actual": 0.5,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Page 1 (page1)",
+          "check": "qr-code-zone height",
+          "expected": 0.5,
+          "actual": 0.5,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "letter-8.5x14": {
+    "slug": "letter-8.5x14",
+    "pageName": "Letter 8.5x14 Legal - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "6:2",
+    "extractedDimensions": {
+      "Page": {
+        "width": 8.5,
+        "height": 14.0,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "page1",
+        "label": "Page 1",
+        "canvas": {
+          "widthPx": 816.0,
+          "heightPx": 1344.0,
+          "widthIn": 8.5,
+          "heightIn": 13.9999
+        },
+        "extractedZones": {
+          "and": {
+            "value": 3.75,
+            "unit": "inches"
+          },
+          "page_edge": {
+            "width": 8.5,
+            "height": 14.0,
+            "unit": "inches"
+          },
+          "fold_line_1": {
+            "value": 3.75,
+            "unit": "inches"
+          },
+          "fold_line_2": {
+            "value": 7.0,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "Page 1 (page1)",
+          "check": "Canvas width",
+          "expected": 8.5,
+          "actual": 8.5,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Page 1 (page1)",
+          "check": "Canvas height",
+          "expected": 14,
+          "actual": 13.9999,
+          "diff": 0.0001,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "card-affix": {
+    "slug": "card-affix",
+    "pageName": "Card Affix - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "7:2",
+    "extractedDimensions": {},
+    "surfaces": [
+      {
+        "id": "all",
+        "label": "All",
+        "canvas": {
+          "widthPx": 1157.8,
+          "heightPx": 360.1,
+          "widthIn": 12.0602,
+          "heightIn": 3.751
+        },
+        "extractedZones": {
+          "vertical_orientation": {
+            "value": 2.125,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "width": 1.875,
+            "height": 3.125,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 3.125,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "all",
+        "label": "All",
+        "canvas": {
+          "widthPx": 1157.8,
+          "heightPx": 240.1,
+          "widthIn": 12.0602,
+          "heightIn": 2.501
+        },
+        "extractedZones": {
+          "horizontal_orientation": {
+            "value": 3.375,
+            "unit": "inches"
+          },
+          "safe_zone": {
+            "width": 3.125,
+            "height": 1.875,
+            "unit": "inches"
+          },
+          "safe": {
+            "value": 1.875,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [],
+      "status": "pass"
+    }
+  },
+  "selfmailer-6x18-bifold": {
+    "slug": "selfmailer-6x18-bifold",
+    "pageName": "Self-Mailer 6x18 Bifold - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "8:2",
+    "extractedDimensions": {
+      "Unfolded": {
+        "width": 6.0,
+        "height": 18.0,
+        "unit": "inches"
+      },
+      "horizontally": {
+        "width": 6.0,
+        "height": 9.0,
+        "unit": "inches"
+      },
+      "free": {
+        "width": 4.0,
+        "height": 2.375,
+        "unit": "inches"
+      },
+      "on left panel": {
+        "width": 4.0,
+        "height": 2.375,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "outside",
+        "label": "Outside",
+        "canvas": {
+          "widthPx": 1752.0,
+          "heightPx": 600.0,
+          "widthIn": 18.25,
+          "heightIn": 6.25
+        },
+        "extractedZones": {
+          "free": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "on_left_panel": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 6.0,
+            "height": 18.0,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "inside",
+        "label": "Inside",
+        "canvas": {
+          "widthPx": 1752.0,
+          "heightPx": 600.0,
+          "widthIn": 18.25,
+          "heightIn": 6.25
+        },
+        "extractedZones": {
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 6.0,
+            "height": 18.0,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 18,
+          "actual": 18.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 6,
+          "actual": 6.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas width",
+          "expected": 18.25,
+          "actual": 18.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas width",
+          "expected": 18.25,
+          "actual": 18.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas height",
+          "expected": 6.25,
+          "actual": 6.25,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "selfmailer-12x9-bifold": {
+    "slug": "selfmailer-12x9-bifold",
+    "pageName": "Self-Mailer 12x9 Bifold - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "9:2",
+    "extractedDimensions": {
+      "Unfolded": {
+        "width": 12.0,
+        "height": 9.0,
+        "unit": "inches"
+      },
+      "free": {
+        "width": 4.0,
+        "height": 2.375,
+        "unit": "inches"
+      },
+      "on top panel": {
+        "width": 4.0,
+        "height": 2.375,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "outside",
+        "label": "Outside",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 1176.0,
+          "widthIn": 9.2499,
+          "heightIn": 12.25
+        },
+        "extractedZones": {
+          "free": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "on_top_panel": {
+            "width": 4.0,
+            "height": 2.375,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 12.0,
+            "height": 9.0,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "inside",
+        "label": "Inside",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 1176.0,
+          "widthIn": 9.2499,
+          "heightIn": 12.25
+        },
+        "extractedZones": {
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 12.0,
+            "height": 9.0,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 9,
+          "actual": 9.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 12,
+          "actual": 12.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas height",
+          "expected": 12.25,
+          "actual": 12.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas height",
+          "expected": 12.25,
+          "actual": 12.25,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "selfmailer-11x9-bifold": {
+    "slug": "selfmailer-11x9-bifold",
+    "pageName": "Self-Mailer 11x9 Bifold - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "10:2",
+    "extractedDimensions": {
+      "Unfolded": {
+        "width": 11.0,
+        "height": 9.0,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "outside",
+        "label": "Outside",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 1080.0,
+          "widthIn": 9.2499,
+          "heightIn": 11.25
+        },
+        "extractedZones": {
+          "offset": {
+            "value": 1.0,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 11.0,
+            "height": 9.0,
+            "unit": "inches"
+          },
+          "fold": {
+            "value": 1.0,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "inside",
+        "label": "Inside",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 1080.0,
+          "widthIn": 9.2499,
+          "heightIn": 11.25
+        },
+        "extractedZones": {
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 11.0,
+            "height": 9.0,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 9,
+          "actual": 9.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 11,
+          "actual": 11.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas height",
+          "expected": 11.25,
+          "actual": 11.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas height",
+          "expected": 11.25,
+          "actual": 11.25,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "selfmailer-17.75x9-trifold": {
+    "slug": "selfmailer-17.75x9-trifold",
+    "pageName": "Self-Mailer 17.75x9 Trifold - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "11:2",
+    "extractedDimensions": {
+      "Unfolded": {
+        "width": 17.75,
+        "height": 9.0,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "outside",
+        "label": "Outside",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 1728.0,
+          "widthIn": 9.2499,
+          "heightIn": 17.9999
+        },
+        "extractedZones": {
+          "score": {
+            "value": 12.0,
+            "unit": "inches"
+          },
+          "offset": {
+            "value": 0.25,
+            "unit": "inches"
+          },
+          "glue_zone": {
+            "width": 9.0,
+            "height": 0.5,
+            "unit": "inches"
+          },
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 17.75,
+            "height": 9.0,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "inside",
+        "label": "Inside",
+        "canvas": {
+          "widthPx": 888.0,
+          "heightPx": 1728.0,
+          "widthIn": 9.2499,
+          "heightIn": 17.9999
+        },
+        "extractedZones": {
+          "bleed": {
+            "value": 0.125,
+            "unit": "inches"
+          },
+          "trim": {
+            "width": 17.75,
+            "height": 9.0,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "Bleed inset",
+          "expected": 0.125,
+          "actual": 0.125,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim width",
+          "expected": 9,
+          "actual": 9.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Trim height",
+          "expected": 17.75,
+          "actual": 17.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas height",
+          "expected": 18,
+          "actual": 17.9999,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas width",
+          "expected": 9.25,
+          "actual": 9.2499,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas height",
+          "expected": 18,
+          "actual": 17.9999,
+          "diff": 0.0001,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "snappack-8.5x11": {
+    "slug": "snappack-8.5x11",
+    "pageName": "Snap Pack 8.5x11 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "12:2",
+    "extractedDimensions": {
+      "Final Trim": {
+        "width": 8.5,
+        "height": 11.0,
+        "unit": "inches"
+      },
+      "Folded": {
+        "width": 8.5,
+        "height": 5.5,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "outside",
+        "label": "Outside",
+        "canvas": {
+          "widthPx": 816.0,
+          "heightPx": 1056.0,
+          "widthIn": 8.5,
+          "heightIn": 11.0
+        },
+        "extractedZones": {
+          "816px_x_1056px": {
+            "value": 8.5,
+            "unit": "inches"
+          },
+          "no-print_area": {
+            "value": 0.5,
+            "unit": "inches"
+          },
+          "perf": {
+            "width": 7.5,
+            "height": 10.0,
+            "unit": "inches"
+          },
+          "safe": {
+            "width": 7.25,
+            "height": 9.75,
+            "unit": "inches"
+          }
+        }
+      },
+      {
+        "id": "inside",
+        "label": "Inside",
+        "canvas": {
+          "widthPx": 816.0,
+          "heightPx": 1056.0,
+          "widthIn": 8.5,
+          "heightIn": 11.0
+        },
+        "extractedZones": {
+          "816px_x_1056px": {
+            "value": 8.5,
+            "unit": "inches"
+          },
+          "no-print_area": {
+            "value": 0.5,
+            "unit": "inches"
+          },
+          "perf": {
+            "width": 7.5,
+            "height": 10.0,
+            "unit": "inches"
+          },
+          "safe": {
+            "width": 7.25,
+            "height": 9.75,
+            "unit": "inches"
+          }
+        }
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "Safe width",
+          "expected": 7.25,
+          "actual": 7.25,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "Safe height",
+          "expected": 9.75,
+          "actual": 9.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas width",
+          "expected": 8.5,
+          "actual": 8.5,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Outside (outside)",
+          "check": "Canvas height",
+          "expected": 11,
+          "actual": 11.0,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas width",
+          "expected": 8.5,
+          "actual": 8.5,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Inside (inside)",
+          "check": "Canvas height",
+          "expected": 11,
+          "actual": 11.0,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "booklet-8.375x5.375": {
+    "slug": "booklet-8.375x5.375",
+    "pageName": "Booklet 8.375x5.375 - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "13:2",
+    "extractedDimensions": {
+      "Page": {
+        "width": 8.375,
+        "height": 5.375,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "front",
+        "label": "Front",
+        "canvas": {
+          "widthPx": 804.0,
+          "heightPx": 516.0,
+          "widthIn": 8.3749,
+          "heightIn": 5.375
+        },
+        "extractedZones": {}
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "Front (front)",
+          "check": "Canvas width",
+          "expected": 8.375,
+          "actual": 8.3749,
+          "diff": 0.0001,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas height",
+          "expected": 5.375,
+          "actual": 5.375,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  },
+  "buckslip": {
+    "slug": "buckslip",
+    "pageName": "Buckslip - Base Scaffold",
+    "figmaFileKey": "f5KZBEihbdL5D4oZdROVKD",
+    "figmaNodeId": "14:2",
+    "extractedDimensions": {
+      "Bleed": {
+        "width": 8.75,
+        "height": 3.75,
+        "unit": "inches"
+      },
+      "Trim": {
+        "width": 8.5,
+        "height": 3.5,
+        "unit": "inches"
+      }
+    },
+    "surfaces": [
+      {
+        "id": "front",
+        "label": "Front",
+        "canvas": {
+          "widthPx": 840.0,
+          "heightPx": 360.0,
+          "widthIn": 8.75,
+          "heightIn": 3.75
+        },
+        "extractedZones": {}
+      },
+      {
+        "id": "back",
+        "label": "Back",
+        "canvas": {
+          "widthPx": 840.0,
+          "heightPx": 360.0,
+          "widthIn": 8.75,
+          "heightIn": 3.75
+        },
+        "extractedZones": {}
+      }
+    ],
+    "validation": {
+      "checks": [
+        {
+          "surface": "header",
+          "check": "File width",
+          "expected": 8.75,
+          "actual": 8.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "header",
+          "check": "File height",
+          "expected": 3.75,
+          "actual": 3.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas width",
+          "expected": 8.75,
+          "actual": 8.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Front (front)",
+          "check": "Canvas height",
+          "expected": 3.75,
+          "actual": 3.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas width",
+          "expected": 8.75,
+          "actual": 8.75,
+          "diff": 0.0,
+          "status": "OK"
+        },
+        {
+          "surface": "Back (back)",
+          "check": "Canvas height",
+          "expected": 3.75,
+          "actual": 3.75,
+          "diff": 0.0,
+          "status": "OK"
+        }
+      ],
+      "status": "pass"
+    }
+  }
+}
