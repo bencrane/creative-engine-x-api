@@ -1,0 +1,320 @@
+spec_id: audio__voice_channel
+artifact_type: audio
+surface: voice_channel   # voicemail drops, audio ads, ringless voicemail campaigns
+version: "1.0"
+description: >
+  Renders spoken-word audio for voicemail drop campaigns and audio advertising
+  channels. Uses ElevenLabs TTS (eleven_multilingual_v2 model) for highest-quality
+  pre-recorded audio. Outputs MP3 at 44.1 kHz / 128 kbps — compatible with Twilio
+  and all major voicemail drop platforms. If script_text is not supplied, Claude
+  Sonnet generates the voicemail script first; ElevenLabs then renders the audio.
+  Delivery is async (ElevenLabs TTS can take 10-30 s for longer scripts).
+
+# ─────────────────────────────────────────────
+# CONSTRAINTS
+# ─────────────────────────────────────────────
+constraints:
+  hard:
+    elevenlabs_model: eleven_multilingual_v2    # highest quality for pre-recorded audio
+    output_format: mp3_44100_128               # Twilio-compatible; 44.1 kHz, 128 kbps
+    max_chars_per_tts_request: 5000            # ElevenLabs hard limit per API call
+    min_duration_seconds: 15
+    max_duration_seconds: 60
+    twilio_compatible: true
+
+  soft:
+    words_per_minute: 150                      # reference rate for script word count estimation
+    # At 150 WPM: 15s ≈ 38 words, 30s ≈ 75 words, 60s ≈ 150 words
+    word_count_guidance:
+      15s: "~38 words"
+      30s: "~75 words"
+      45s: "~113 words"
+      60s: "~150 words"
+    voice_settings_recommended:
+      stability: {min: 0.5, max: 0.7, default: 0.6}
+      similarity_boost: {min: 0.75, max: 0.85, default: 0.8}
+      style: {min: 0.1, max: 0.3, default: 0.15}
+      use_speaker_boost: true
+    tone_guidelines:
+      - Conversational and warm — not read from a script
+      - First-person singular preferred ("I wanted to reach out...")
+      - One clear CTA only — avoid multiple asks
+      - No hard sell language in opening 5 seconds
+
+# ─────────────────────────────────────────────
+# PIPELINE
+# ─────────────────────────────────────────────
+pipeline:
+  generator: audio_script          # Claude Sonnet → voicemail script text
+  renderer: audio_renderer         # ElevenLabs TTS API → MP3 binary → Supabase Storage
+  provider: elevenlabs_provider    # wraps POST /v1/text-to-speech/{voice_id}
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.7          # natural, conversational tone
+
+  steps:
+    1_script_generation:
+      description: >
+        If content_props.script_text is not provided, call Claude Sonnet
+        (audio_script generator) to write a voicemail script. Output is
+        plain-text prose (no SSML tags, no markdown). The script is constrained
+        to the target word count derived from duration_target at 150 WPM.
+        Claude incorporates topic, recipient_context, and a single CTA.
+      condition: script_text not provided in content_props
+      constraints:
+        - Plain text only — no formatting, no headers, no bullet points
+        - Target word count = floor(duration_target_seconds / 60 * 150)
+        - Must not exceed 5000 characters
+        - Single clear CTA in the final sentence
+      output:
+        script_text: string    # the final voicemail script for TTS
+
+    2_tts_render:
+      description: >
+        POST /v1/text-to-speech/{voice_id} with the script_text, model
+        eleven_multilingual_v2, output_format mp3_44100_128, and resolved
+        voice_settings. Returns binary MP3 audio.
+      elevenlabs_endpoint: "POST /v1/text-to-speech/{voice_id}"
+      request_body:
+        text: "{script_text}"
+        model_id: eleven_multilingual_v2
+        output_format: mp3_44100_128
+        voice_settings:
+          stability: 0.6             # overridden by voice_settings_override if provided
+          similarity_boost: 0.8
+          style: 0.15
+          use_speaker_boost: true
+          speed: 1.0                 # 1.0 = normal; 0.8-1.2 range supported
+      expected_latency_seconds: "10-30 depending on script length"
+
+    3_asset_upload:
+      description: >
+        Upload MP3 binary to Supabase Storage bucket "assets".
+        Insert/update generated_assets record with content_url, status=completed,
+        and metadata (duration_seconds, word_count, voice_id_used).
+
+# ─────────────────────────────────────────────
+# ELEVENLABS PROVIDER CONFIG
+# ─────────────────────────────────────────────
+elevenlabs_provider:
+  api_base: "https://api.elevenlabs.io"
+  tts_endpoint: "/v1/text-to-speech/{voice_id}"
+  voices_endpoint: "/v1/voices"
+  default_voice_id: "${ELEVENLABS_DEFAULT_VOICE_ID}"  # set per deployment
+  model_id: eleven_multilingual_v2
+  output_format: mp3_44100_128
+  auth_header: "xi-api-key: ${ELEVENLABS_API_KEY}"
+  rate_limits:
+    note: >
+      ElevenLabs enforces per-model concurrency groups. eleven_multilingual_v2
+      has lower concurrency limits than eleven_flash_v2_5. For high-volume
+      batch campaigns (>50 concurrent renders), queue requests and respect
+      429 responses with exponential backoff.
+  python_sdk: elevenlabs
+
+# ─────────────────────────────────────────────
+# DELIVERY
+# ─────────────────────────────────────────────
+delivery:
+  mode: async
+  output_format: audio/mpeg
+  storage: supabase
+  bucket: assets
+  path_template: "audio/voice/{organization_id}/{asset_id}.mp3"
+  webhook_on_complete: false   # ElevenLabs does not emit webhooks; polling via job status
+
+# ─────────────────────────────────────────────
+# CONTENT PROPS SCHEMA
+# ─────────────────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    script_text:
+      type: string
+      description: >
+        Optional. Pre-written voicemail script text. If provided, skips Claude
+        script generation and passes directly to ElevenLabs TTS. Must be plain
+        text with no markdown or HTML. Maximum 5000 characters.
+      maxLength: 5000
+
+    topic:
+      type: string
+      description: >
+        The subject or offer for the voicemail. Used by Claude when generating
+        the script. Example: "Follow-up on demo request for our analytics platform".
+
+    recipient_context:
+      type: string
+      description: >
+        Brief description of the recipient to personalise tone and references.
+        Example: "VP of Sales at a mid-market SaaS company, expressed interest
+        in our CRM last week". Used by Claude for script generation.
+
+    duration_target:
+      type: integer
+      enum: [15, 30, 45, 60]
+      description: >
+        Target audio duration in seconds. Determines Claude's word count target
+        (150 WPM): 15s≈38w, 30s≈75w, 45s≈113w, 60s≈150w.
+      default: 30
+
+    voice_id:
+      type: string
+      description: >
+        Optional. ElevenLabs voice_id to use. Overrides the deployment default
+        voice. List available voices via GET /v1/voices.
+      example: "pNInz6obpgDQGcFmaJgB"   # "Adam" — ElevenLabs pre-made voice
+
+    voice_settings_override:
+      type: object
+      description: >
+        Optional. Override any subset of ElevenLabs voice settings.
+        Values outside recommended ranges are accepted but noted.
+      properties:
+        stability:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: >
+            Consistency of voice tone. Lower = more expressive/variable.
+            Recommended 0.5-0.7 for voicemail.
+        similarity_boost:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: >
+            Adherence to target voice. Higher = closer to reference voice.
+            Recommended 0.75-0.85.
+        style:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: >
+            Style exaggeration. Keep low (0.1-0.3) for natural voicemail tone.
+        use_speaker_boost:
+          type: boolean
+          description: Boosts speaker similarity. Recommended true.
+        speed:
+          type: number
+          minimum: 0.5
+          maximum: 2.0
+          description: >
+            Playback speed multiplier. 1.0 = normal. 0.9-1.0 preferred for
+            voicemail (slightly slower = more natural, less rushed).
+          default: 1.0
+
+  required:
+    - topic
+    - duration_target
+
+# ─────────────────────────────────────────────
+# OUTPUT SCHEMA
+# ─────────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    asset_id:
+      type: string
+      format: uuid
+    status:
+      type: string
+      enum: [queued, rendering, done, error]
+    content_url:
+      type: string
+      format: uri
+      description: Public Supabase Storage URL of the rendered MP3.
+    metadata:
+      type: object
+      properties:
+        duration_seconds:
+          type: number
+          description: Actual rendered audio duration (measured post-render).
+        word_count:
+          type: integer
+          description: Word count of the final script_text submitted to ElevenLabs.
+        character_count:
+          type: integer
+          description: Character count of script_text (must be ≤5000).
+        voice_id_used:
+          type: string
+          description: The ElevenLabs voice_id that was used for this render.
+        model_used:
+          type: string
+          description: Always "eleven_multilingual_v2" for this spec.
+        output_format:
+          type: string
+          description: Always "mp3_44100_128".
+        script_generated_by_claude:
+          type: boolean
+          description: True if Claude generated the script; false if script_text was provided.
+    script_text_used:
+      type: string
+      description: The final script text submitted to ElevenLabs (for review/audit).
+    created_at:
+      type: string
+      format: date-time
+
+# ─────────────────────────────────────────────
+# EXAMPLE REQUEST
+# ─────────────────────────────────────────────
+example_request:
+  organization_id: "org_abc123"
+  campaign_id: "camp_xyz789"
+  spec_id: audio__voice_channel
+  content_props:
+    topic: "Follow-up after our product demo — offering a free 30-day trial"
+    recipient_context: >
+      Sarah Chen, Head of Revenue Operations at a 200-person B2B SaaS company.
+      Attended our product demo last Tuesday. Expressed interest in the
+      Salesforce integration feature.
+    duration_target: 30
+    voice_settings_override:
+      stability: 0.6
+      similarity_boost: 0.8
+      style: 0.15
+      use_speaker_boost: true
+      speed: 0.95
+
+# ─────────────────────────────────────────────
+# EXAMPLE RESPONSE
+# ─────────────────────────────────────────────
+example_response:
+  asset_id: "d4e5f6a7-b8c9-0123-defa-234567890123"
+  status: "done"
+  content_url: "https://supabase-project.supabase.co/storage/v1/object/public/assets/audio/voice/org_abc123/d4e5f6a7-b8c9-0123-defa-234567890123.mp3"
+  metadata:
+    duration_seconds: 28.4
+    word_count: 71
+    character_count: 412
+    voice_id_used: "pNInz6obpgDQGcFmaJgB"
+    model_used: "eleven_multilingual_v2"
+    output_format: "mp3_44100_128"
+    script_generated_by_claude: true
+  script_text_used: >
+    Hey Sarah, this is Alex from Acme — just wanted to follow up after our demo on Tuesday.
+    I know the Salesforce integration was top of mind for you, and I wanted to let you know
+    we've set aside a 30-day free trial so your team can test it live in your own environment.
+    No commitment needed. Give me a call back at 555-234-5678 or shoot me an email and I'll
+    get you set up today. Thanks, Sarah — talk soon.
+  created_at: "2026-03-26T16:15:00Z"
+
+# ─────────────────────────────────────────────
+# QUALITY BAR
+# ─────────────────────────────────────────────
+quality_bar: >
+  The rendered audio must sound natural and conversational — not robotic or
+  overly formal. Pacing should feel unhurried at ~150 WPM target. The voice
+  must be consistent throughout (no audio artifacts, no sudden pitch shifts).
+  The script must contain exactly one CTA delivered in the final 10 seconds.
+  Output file must be playable by Twilio without transcoding (mp3_44100_128).
+  Actual duration must be within ±10% of the duration_target.
+
+acceptance_criteria:
+  - Output is MP3 at 44.1 kHz / 128 kbps (mp3_44100_128 ElevenLabs format).
+  - Actual audio duration is within ±10% of duration_target (e.g. 30s target → 27-33s).
+  - Script character count does not exceed 5000 characters.
+  - ElevenLabs model used is eleven_multilingual_v2.
+  - Script contains exactly one CTA, placed in the final sentence or two.
+  - If script_text was not provided, script_text_used in output reflects Claude's generated script.
+  - Audio file is accessible via content_url immediately after status transitions to done.
+  - generated_assets record status transitions: queued → rendering → done | error with timestamps.
+  - voice_id_used in metadata accurately reflects the voice used (not the default placeholder).

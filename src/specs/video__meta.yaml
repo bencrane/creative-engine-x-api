@@ -1,0 +1,294 @@
+spec_id: video__meta
+artifact_type: video
+surface: meta_ads  # Facebook Feed, Instagram Feed, Instagram Stories, Instagram Reels, Facebook In-Stream
+version: "1.0"
+description: >
+  Renders short-form video ads for Meta platforms (Facebook and Instagram).
+  Supports three aspect ratios targeting feed, stories/reels, and in-stream
+  placements. Videos are generated via Remotion Lambda (async), stored in S3,
+  then copied to Supabase Storage for delivery. A Claude Sonnet script/scene
+  plan is generated first when scenes are not pre-supplied.
+
+# ─────────────────────────────────────────────
+# CONSTRAINTS
+# ─────────────────────────────────────────────
+constraints:
+  hard:
+    codec: h264          # mp4 container — only supported codec for Meta uploads
+    fps: 30
+    min_resolution: 1080p
+    max_file_size_gb: 4
+    max_duration_seconds: 240   # Meta policy hard cap; see soft for recommended
+    supported_durations_seconds: [15, 30, 60]
+    aspect_ratios:
+      feed:           "1:1"    # 1080×1080
+      stories_reels:  "9:16"   # 1080×1920
+      in_stream:      "16:9"   # 1920×1080
+    remotion_codec: h264       # h265 and av1 NOT available on Lambda
+    no_h265: true
+    no_av1: true
+
+  soft:
+    recommended_max_duration_seconds: 60
+    hook_window_seconds: 3      # first 3 s must contain the primary hook
+    branding_in_seconds: 3      # logo/brand mark must appear within first 3 s
+    text_overlay: true          # captions or key message on screen for sound-off viewing
+    safe_zone_percent: 14       # keep critical content out of outer 14% (stories/reels)
+    cta_placement: last_5s      # call-to-action in final 5 seconds
+    primary_text_max_chars: 125 # Meta recommendation for accompanying ad copy
+    headline_max_chars: 40
+
+# ─────────────────────────────────────────────
+# PIPELINE
+# ─────────────────────────────────────────────
+pipeline:
+  generator: video_script        # Claude Sonnet → structured scene plan JSON
+  renderer: video_renderer       # Remotion Lambda → renders frames → MP4 on S3
+  provider: remotion_provider    # wraps renderMediaOnLambda() + getRenderProgress()
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.7
+
+  steps:
+    1_script_generation:
+      description: >
+        If content_props.scenes is not provided, call Claude Sonnet (video_script generator)
+        to produce a structured scene plan. Output includes scene-by-scene text overlays,
+        visual direction, and timing cues aligned to the requested duration.
+      condition: scenes not provided in content_props
+      output_schema:
+        scenes:
+          type: array
+          items:
+            scene_index: integer
+            duration_seconds: number
+            headline: string
+            body_text: string
+            visual_direction: string
+            cta: string | null
+
+    2_remotion_render:
+      description: >
+        Call renderMediaOnLambda() with the resolved composition id, inputProps
+        containing content_props + scene plan, and codec h264. Receive renderId for
+        async progress polling.
+      remotion_call: renderMediaOnLambda
+      params:
+        region: us-east-1          # configurable per deployment
+        functionName: remotion-render-fn
+        serveUrl: "https://s3.amazonaws.com/<bucket>/remotion-bundle/index.html"
+        composition: meta_video_ad  # composition id registered in Remotion project
+        codec: h264
+        framesPerLambda: 20        # tune for cost vs. concurrency; max 200 workers
+        privacy: private
+        webhook:
+          url: "https://api.creative-engine-x.internal/webhooks/remotion"
+          secret: "${REMOTION_WEBHOOK_SECRET}"
+
+    3_progress_polling:
+      description: >
+        Poll getRenderProgress(renderId) until progress reaches 1.0 or webhook fires.
+        Expose status (queued | rendering | done | error) via async job record.
+      poll_interval_seconds: 5
+      timeout_seconds: 600
+
+    4_asset_copy:
+      description: >
+        On completion, copy the S3 output URL to Supabase Storage bucket "assets".
+        Insert/update generated_assets record with content_url, status=completed.
+
+# ─────────────────────────────────────────────
+# REMOTION COMPOSITION SPECS
+# ─────────────────────────────────────────────
+remotion_compositions:
+  - id: meta_video_ad_1x1
+    width: 1080
+    height: 1080
+    fps: 30
+    durationInFrames: 450    # 15s default; overridden at render time via inputProps
+
+  - id: meta_video_ad_9x16
+    width: 1080
+    height: 1920
+    fps: 30
+    durationInFrames: 450
+
+  - id: meta_video_ad_16x9
+    width: 1920
+    height: 1080
+    fps: 30
+    durationInFrames: 450
+
+  # durationInFrames = fps × duration_seconds; set dynamically via inputProps
+
+# ─────────────────────────────────────────────
+# DELIVERY
+# ─────────────────────────────────────────────
+delivery:
+  mode: async
+  output_format: video/mp4
+  storage: supabase            # copied from S3 post-render
+  bucket: assets
+  path_template: "videos/meta/{organization_id}/{asset_id}.mp4"
+  webhook_on_complete: true
+
+# ─────────────────────────────────────────────
+# CONTENT PROPS SCHEMA
+# ─────────────────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    duration:
+      type: integer
+      enum: [15, 30, 60]
+      description: Video duration in seconds.
+
+    aspect_ratio:
+      type: string
+      enum: ["1:1", "9:16", "16:9"]
+      description: >
+        "1:1" = Feed (1080×1080), "9:16" = Stories/Reels (1080×1920),
+        "16:9" = In-Stream (1920×1080).
+
+    topic:
+      type: string
+      description: >
+        The core subject or offer being advertised. Used by Claude to write
+        the scene plan. Example: "Summer sale — 30% off running shoes".
+
+    key_message:
+      type: string
+      description: >
+        Primary value proposition or CTA to communicate. Included in every
+        scene plan as an anchor constraint.
+
+    scenes:
+      type: array
+      description: >
+        Optional. If provided, skips Claude script generation and passes
+        scenes directly to Remotion inputProps.
+      items:
+        type: object
+        properties:
+          scene_index: {type: integer}
+          duration_seconds: {type: number}
+          headline: {type: string}
+          body_text: {type: string}
+          visual_direction: {type: string}
+          cta: {type: string, nullable: true}
+
+    brand_assets:
+      type: object
+      description: Brand-level visual assets passed into Remotion inputProps.
+      properties:
+        logo_url:
+          type: string
+          format: uri
+          description: Public URL of SVG or PNG logo. Rendered in first 3 s.
+        primary_color:
+          type: string
+          description: Hex color code. Example "#1A73E8".
+        secondary_color:
+          type: string
+        font_family:
+          type: string
+          description: Font name pre-loaded in the Remotion composition bundle.
+        background_url:
+          type: string
+          format: uri
+          description: Optional background image or video clip URL.
+
+    voice_over_url:
+      type: string
+      format: uri
+      description: >
+        Optional. Public URL of a pre-rendered MP3 audio track to sync to
+        the video. If provided, Remotion mounts it as the audio source.
+
+  required:
+    - duration
+    - aspect_ratio
+    - topic
+    - key_message
+
+# ─────────────────────────────────────────────
+# OUTPUT SCHEMA
+# ─────────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    asset_id:
+      type: string
+      format: uuid
+    status:
+      type: string
+      enum: [queued, rendering, done, error]
+    content_url:
+      type: string
+      format: uri
+      description: Public Supabase Storage URL of the rendered MP4.
+    metadata:
+      type: object
+      properties:
+        duration_seconds: {type: number}
+        width: {type: integer}
+        height: {type: integer}
+        fps: {type: integer}
+        codec: {type: string}
+        file_size_bytes: {type: integer}
+        aspect_ratio: {type: string}
+    render_id:
+      type: string
+      description: Remotion Lambda renderId for external progress polling.
+    created_at:
+      type: string
+      format: date-time
+
+# ─────────────────────────────────────────────
+# EXAMPLE REQUEST
+# ─────────────────────────────────────────────
+example_request:
+  organization_id: "org_abc123"
+  campaign_id: "camp_xyz789"
+  spec_id: video__meta
+  content_props:
+    duration: 15
+    aspect_ratio: "9:16"
+    topic: "New AI-powered CRM — close 2× more deals"
+    key_message: "Start free — no credit card needed"
+    brand_assets:
+      logo_url: "https://cdn.acme.com/logo.svg"
+      primary_color: "#0057FF"
+      secondary_color: "#FFFFFF"
+      font_family: "Inter"
+
+# ─────────────────────────────────────────────
+# EXAMPLE RESPONSE
+# ─────────────────────────────────────────────
+example_response:
+  asset_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  status: "queued"
+  content_url: null   # populated on completion
+  metadata: null
+  render_id: "remotion-render-abc123"
+  created_at: "2026-03-26T16:00:00Z"
+  # Webhook fires to caller with status=done and content_url once render completes
+
+# ─────────────────────────────────────────────
+# QUALITY BAR
+# ─────────────────────────────────────────────
+quality_bar: >
+  The rendered video must deliver the hook (brand mark + primary message) within
+  the first 3 seconds on all placements. Text overlays must be legible at mobile
+  sizes (≥24px equivalent at 1080p) with sufficient contrast (WCAG AA). No
+  letterboxing artifacts when aspect ratio matches the target composition. File
+  size must stay well under 4 GB limit (typical 15s/30fps H.264 at 1080p is
+  ~10-80 MB depending on bitrate settings).
+
+acceptance_criteria:
+  - Rendered file is H.264 MP4 with 30fps and correct dimensions for the requested aspect ratio.
+  - Duration matches content_props.duration (±0.5 seconds tolerance).
+  - Brand logo appears within the first 3 seconds of playback.
+  - A text overlay conveying key_message is visible in at least one scene.
+  - File is accessible via the returned content_url within 60 seconds of webhook receipt.
+  - generated_assets record status transitions queued → rendering → done (or error) with timestamps.
+  - File size does not exceed 500 MB for any supported duration/resolution combination.

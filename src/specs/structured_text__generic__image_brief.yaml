@@ -1,0 +1,514 @@
+# ============================================================
+# creative-engine-x — Spec: Image Brief (Generic / Structured Text)
+# Generated: 2026-03-26 | Version: 1.0
+# Source audit: Section 2.8 (Image Brief generator)
+# ============================================================
+
+spec_id: structured_text__generic__image_brief
+artifact_type: structured_text
+surface: generic
+subtype: image_brief
+version: "1.0"
+description: >
+  Generates structured creative briefs for image assets across 5 standard
+  platform/format dimensions. Each brief is a self-contained specification
+  that a designer, AI image generator (e.g., Midjourney, DALL-E), or motion
+  designer can execute without further context. Briefs include concept name,
+  visual description, text overlay, color palette (hex codes), mood, style
+  reference, and do-not-include constraints. When multiple platforms are
+  requested, all briefs are generated in parallel within a single Claude Sonnet
+  call. Output is JSON only — no image rendering occurs in this generator.
+
+# ─── Platform / Format Dimensions ──────────────────────────
+platform_formats:
+  linkedin_sponsored:
+    label: "LinkedIn Sponsored Content"
+    width_px: 1200
+    height_px: 628
+    aspect_ratio: "1.91:1"
+    format: "landscape"
+    notes: >
+      Standard LinkedIn single-image ad unit. Appears in desktop and mobile
+      feed. Text overlay should be minimal — LinkedIn's ad policy allows
+      text but cluttered images underperform. Safe zone: avoid critical
+      elements within 50px of edges.
+    recommended_use: "Lead gen ads, event promotions, product announcements"
+
+  linkedin_carousel:
+    label: "LinkedIn Carousel Ad (per slide)"
+    width_px: 1080
+    height_px: 1080
+    aspect_ratio: "1:1"
+    format: "square"
+    notes: >
+      Used for LinkedIn carousel documents and multi-image ads. Each slide
+      should be consistent in style but progress a narrative (e.g., slide 1
+      = problem, slide 2 = stat, etc.). Number/position annotation useful
+      for multi-slide briefs.
+    recommended_use: "Listicles, data stories, step-by-step guides"
+
+  meta_feed:
+    label: "Meta Feed (Facebook & Instagram Feed)"
+    width_px: 1080
+    height_px: 1080
+    aspect_ratio: "1:1"
+    format: "square"
+    notes: >
+      Primary Meta feed ad format. Appears in Facebook News Feed and
+      Instagram Feed. High contrast and bold visuals outperform in feed
+      scroll environments. Text overlay should be ≤20% of image area
+      to avoid Meta's performance penalty (though the 20% rule is no
+      longer hard-enforced, it remains a best practice).
+    recommended_use: "Brand awareness, retargeting, product showcase"
+
+  meta_story:
+    label: "Meta Story / Reels (Facebook & Instagram)"
+    width_px: 1080
+    height_px: 1920
+    aspect_ratio: "9:16"
+    format: "vertical"
+    notes: >
+      Full-screen vertical format for Stories and Reels. Safe zone for
+      critical visual elements and text: 250px from top (UI controls) and
+      320px from bottom (CTA button / swipe-up zone). Design for motion —
+      even static briefs should note whether the asset is for static or
+      animated execution.
+    recommended_use: "Flash sales, immersive brand moments, video ad thumbnails"
+
+  landing_page_hero:
+    label: "Landing Page Hero Image"
+    width_px: 1920
+    height_px: 1080
+    aspect_ratio: "16:9"
+    format: "landscape"
+    notes: >
+      Full-width hero for web landing pages. Must be optimised for both
+      desktop (full 1920×1080 view) and mobile (cropped to ~390×844, so
+      keep subject centred or use responsive CSS art-direction). Should
+      complement not compete with headline text overlaid in the HTML layer.
+    recommended_use: "Campaign landing pages, product launch pages, webinar reg pages"
+
+# ─── Brief Fields (per platform) ────────────────────────────
+brief_field_definitions:
+  concept_name:
+    type: string
+    description: >
+      Short, memorable name for the visual concept. Used as a reference
+      handle by the design team.
+      Example: "Data Chaos vs Clarity Split" or "Founder Headshot CTA".
+
+  intended_use:
+    type: string
+    description: >
+      Specific ad unit or placement context this brief targets.
+      Derived from the platform_format label.
+      Example: "LinkedIn Sponsored Content, single-image ad, demand-gen campaign".
+
+  dimensions:
+    type: object
+    description: Pixel dimensions and aspect ratio from platform_formats.
+    properties:
+      width_px: { type: integer }
+      height_px: { type: integer }
+      aspect_ratio: { type: string }
+
+  visual_description:
+    type: string
+    description: >
+      Detailed description of the image composition, subject(s), background,
+      lighting, and focal point. Should be specific enough for a designer or
+      AI image generator to execute without follow-up questions.
+      Example: "A clean, high-contrast split composition: left half shows
+      a messy spreadsheet on a laptop screen (slightly desaturated), right
+      half shows the Acme Analytics dashboard in bright, crisp colours. No
+      people. White background. Shallow depth of field on right side."
+
+  text_overlay:
+    type: object
+    description: >
+      Text elements to be composited onto the image by the designer.
+      Null if no text overlay is required (e.g., lifestyle photography
+      where copy is handled in the ad headline).
+    properties:
+      headline:
+        type: string
+        description: Primary text overlay. Should be short (≤8 words).
+      subtext:
+        type: string
+        description: Optional secondary text. ≤15 words. Nullable.
+      cta_label:
+        type: string
+        description: Optional CTA button/label text. Nullable.
+      placement_notes:
+        type: string
+        description: Where text should be positioned (e.g., "bottom-left third", "centered top").
+    nullable: true
+
+  color_palette:
+    type: object
+    description: >
+      Colour specifications in hex. Primary and secondary colours from
+      brand guidelines (via brand_context) anchored with accent and
+      background selections appropriate for the platform and mood.
+    properties:
+      primary: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+      secondary: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+      accent: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+      background: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+      text: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+
+  mood:
+    type: string
+    description: >
+      Emotional register the image should evoke. Used to guide lighting,
+      colour temperature, and compositional energy.
+      Examples: "confident and data-driven", "warm and approachable",
+      "urgent and high-stakes", "clean and premium".
+
+  style_reference:
+    type: string
+    description: >
+      Visual style direction. Should reference recognisable aesthetics,
+      photography styles, or design movements rather than specific
+      copyrighted works.
+      Examples: "SaaS product marketing — clean, Figma-inspired UI photography",
+      "Bold editorial typography, monochromatic", "Flat illustration, Notion-style".
+
+  do_not_include:
+    type: array
+    description: >
+      Explicit exclusion list. Things that must not appear in the image.
+      Include brand competitors, inappropriate stock photo archetypes,
+      or visual elements that conflict with brand guidelines.
+      Examples: ["competitor logos", "stock photo handshakes", "clipart",
+      "dark or threatening imagery", "human faces without release"].
+    items: { type: string }
+
+# ─── Constraints ────────────────────────────────────────────
+constraints:
+  hard:
+    platforms:
+      note: >
+        content_props.platforms must contain only values from the
+        platform_formats enum. Unknown platform keys are rejected.
+    brief_completeness:
+      note: >
+        Every brief must include all required fields. visual_description
+        must be ≥50 words to be considered actionable. color_palette
+        must include all 5 hex fields.
+
+  soft:
+    visual_description:
+      recommended_min_words: 50
+    do_not_include:
+      note: >
+        Should always include at least 2 items — at minimum, competitor
+        exclusions and generic stock photo archetypes to avoid.
+    text_overlay:
+      note: >
+        For meta_story and linkedin_carousel, text_overlay should always
+        be populated. For photography-style assets (landing_page_hero,
+        meta_feed), text_overlay may be null if copy is handled in the
+        HTML/ad layer.
+
+# ─── Pipeline ───────────────────────────────────────────────
+pipeline:
+  generator: generators.image_brief.ImageBriefGenerator
+  renderer: null
+  provider: null
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.7
+  claude_max_tokens: 4096
+  generation_strategy: >
+    Single Claude call via tool_use pattern. All requested platform briefs are
+    generated in parallel within one response. System prompt carries brand
+    context (AssetContext: company_name, brand_guidelines, brand_voice,
+    value_proposition). The model receives the full platform_formats specification
+    as context so it can tailor visual_description, text_overlay placement, and
+    safe-zone guidance per format. Briefs should share a consistent visual
+    identity (colour palette, mood) while adapting composition for each
+    format's aspect ratio and viewing context.
+
+# ─── Delivery ───────────────────────────────────────────────
+delivery:
+  mode: sync
+  output_format: application/json
+  storage: null    # inline JSON stored in generated_assets.content_json column
+  asset_type_enum: image_brief
+  surface_tag: generic
+
+# ─── Content Props Schema ───────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    platforms:
+      type: array
+      description: >
+        List of platform/format keys to generate briefs for.
+        Each key maps to a platform_formats entry.
+        Providing multiple keys generates all briefs in one call.
+      items:
+        type: string
+        enum:
+          - linkedin_sponsored
+          - linkedin_carousel
+          - meta_feed
+          - meta_story
+          - landing_page_hero
+      minItems: 1
+      maxItems: 5
+
+    topic:
+      type: string
+      description: >
+        The campaign theme, product feature, or message being visualised.
+        Examples: "AI sales forecasting product launch",
+        "Free trial offer — project management tool",
+        "Quarterly benchmark report download".
+      maxLength: 300
+
+    brand_aesthetic:
+      type: string
+      description: >
+        Description of the brand's visual identity. Supplements brand_guidelines
+        from brand_context. Include colour preferences, photography style,
+        typography style, and any "do not" rules.
+        Examples: "Clean, minimal SaaS aesthetic. Primary blue #1A6FFF, white
+        backgrounds, Inter typeface. No skeuomorphic elements. No stock photos
+        with fake smiling people."
+      maxLength: 1000
+
+    key_message:
+      type: string
+      description: >
+        The single most important message the image should communicate.
+        This becomes the anchor for text_overlay and visual concept.
+        Examples: "5% revenue forecast accuracy",
+        "Replace your spreadsheets today", "Join 10,000+ teams".
+      maxLength: 300
+
+  required:
+    - platforms
+    - topic
+    - brand_aesthetic
+    - key_message
+
+# ─── Output Schema ──────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    briefs:
+      type: array
+      description: One brief object per requested platform, in the same order as content_props.platforms.
+      minItems: 1
+      maxItems: 5
+      items:
+        type: object
+        properties:
+          platform_key:
+            type: string
+            description: The platform_formats key this brief targets.
+            enum:
+              - linkedin_sponsored
+              - linkedin_carousel
+              - meta_feed
+              - meta_story
+              - landing_page_hero
+          concept_name:
+            type: string
+          intended_use:
+            type: string
+          dimensions:
+            type: object
+            properties:
+              width_px: { type: integer }
+              height_px: { type: integer }
+              aspect_ratio: { type: string }
+            required: [width_px, height_px, aspect_ratio]
+          visual_description:
+            type: string
+            minLength: 50
+          text_overlay:
+            type: object
+            properties:
+              headline: { type: string }
+              subtext: { type: string, nullable: true }
+              cta_label: { type: string, nullable: true }
+              placement_notes: { type: string }
+            nullable: true
+          color_palette:
+            type: object
+            properties:
+              primary: { type: string }
+              secondary: { type: string }
+              accent: { type: string }
+              background: { type: string }
+              text: { type: string }
+            required: [primary, secondary, accent, background, text]
+          mood:
+            type: string
+          style_reference:
+            type: string
+          do_not_include:
+            type: array
+            items: { type: string }
+            minItems: 2
+        required:
+          - platform_key
+          - concept_name
+          - intended_use
+          - dimensions
+          - visual_description
+          - color_palette
+          - mood
+          - style_reference
+          - do_not_include
+
+    generation_metadata:
+      type: object
+      properties:
+        model: { type: string }
+        platforms_requested:
+          type: array
+          items: { type: string }
+        briefs_generated: { type: integer }
+        generated_at: { type: string, format: date-time }
+
+  required:
+    - briefs
+    - generation_metadata
+
+# ─── Example Request ────────────────────────────────────────
+example_request:
+  content_props:
+    platforms:
+      - linkedin_sponsored
+      - meta_story
+    topic: "AI sales forecasting software — Acme Analytics product launch"
+    brand_aesthetic: >
+      Clean, premium SaaS aesthetic. Primary brand blue #1A6FFF, secondary
+      dark navy #0D1F3C, white backgrounds. Inter or similar sans-serif typeface.
+      Data visualisation and dashboard UI photography preferred over stock
+      lifestyle images. No human faces unless from real customer case studies.
+    key_message: "Predict revenue within 5% accuracy — no data science team needed."
+  brand_context:
+    company_name: "Acme Analytics"
+    brand_voice: "Direct, data-driven, confident."
+
+# ─── Example Response ───────────────────────────────────────
+example_response:
+  briefs:
+    - platform_key: linkedin_sponsored
+      concept_name: "Forecast Accuracy Split"
+      intended_use: "LinkedIn Sponsored Content, single-image ad, product launch demand-gen campaign"
+      dimensions:
+        width_px: 1200
+        height_px: 628
+        aspect_ratio: "1.91:1"
+      visual_description: >
+        Clean split-panel composition on white background. Left panel (40% width):
+        a desaturated, slightly blurred screenshot of a typical spreadsheet with
+        highlighted red cells indicating forecast errors. Small red label: 'Old way'.
+        Right panel (60% width): Acme Analytics dashboard screenshot in full colour,
+        showing a clean revenue forecast curve with a prominent '5% accuracy' badge
+        in brand blue (#1A6FFF). A thin vertical divider line between panels.
+        No people. Subtle drop shadow on the dashboard screenshot. Plenty of
+        white breathing room above and below panels.
+      text_overlay:
+        headline: "Stop guessing. Start forecasting."
+        subtext: "5% accuracy. Zero data science required."
+        cta_label: "See a Demo"
+        placement_notes: "Headline bottom-left of image, white background zone. CTA label bottom-right as a blue pill button."
+      color_palette:
+        primary: "#1A6FFF"
+        secondary: "#0D1F3C"
+        accent: "#00C9A7"
+        background: "#FFFFFF"
+        text: "#0D1F3C"
+      mood: "Confident, precise, and trustworthy — data-driven clarity over chaos."
+      style_reference: >
+        SaaS product marketing aesthetic — clean Figma/Linear UI photography style.
+        High contrast between 'old way' and 'new way'. Minimal, no decorative elements.
+      do_not_include:
+        - "Competitor logos or product screenshots"
+        - "Generic stock photo handshakes or conference rooms"
+        - "Clipart or skeuomorphic design elements"
+        - "Dark or ominous imagery"
+        - "Human faces"
+
+    - platform_key: meta_story
+      concept_name: "Accuracy Badge Story"
+      intended_use: "Meta Instagram/Facebook Story, full-screen vertical static ad, product launch campaign"
+      dimensions:
+        width_px: 1080
+        height_px: 1920
+        aspect_ratio: "9:16"
+      visual_description: >
+        Full-screen vertical composition. Dark navy background (#0D1F3C) with
+        a large, glowing circular badge centred in the frame (600px diameter).
+        Inside the badge: the number '5%' in very large bold white type
+        (120pt+), with 'accuracy' in smaller weight below it. A thin ring
+        around the badge in accent teal (#00C9A7). Above the badge (in the
+        safe zone, below 250px from top): Acme Analytics wordmark in white.
+        Below the badge (above 320px from bottom safe zone): 'Your CRM data.
+        Zero guesswork.' in white Inter Regular. Bottom third: brand-blue
+        (#1A6FFF) pill CTA 'See a Live Demo →'. Background subtle texture:
+        very faint grid pattern (#1a2a40) to add depth without distraction.
+      text_overlay:
+        headline: "5% revenue forecast accuracy."
+        subtext: "Your CRM data. Zero guesswork."
+        cta_label: "See a Live Demo →"
+        placement_notes: >
+          Wordmark centered at top safe zone. Badge centered in frame.
+          Headline and subtext below badge. CTA pill button bottom safe
+          zone, full-width minus 40px padding.
+      color_palette:
+        primary: "#1A6FFF"
+        secondary: "#0D1F3C"
+        accent: "#00C9A7"
+        background: "#0D1F3C"
+        text: "#FFFFFF"
+      mood: "Bold, premium, and arresting — stops the scroll in 1 second."
+      style_reference: >
+        Bold data-hero graphic style — large typographic centrepiece with
+        premium dark background. Influenced by SaaS award badges and
+        performance-marketing story creatives. Clean, single-focus composition.
+      do_not_include:
+        - "Competitor logos"
+        - "Stock photo lifestyle imagery"
+        - "Multiple competing visual elements (one focal point only)"
+        - "Light backgrounds (dark treatment required for this concept)"
+        - "Human faces"
+
+  generation_metadata:
+    model: "claude-sonnet-4-20250514"
+    platforms_requested:
+      - linkedin_sponsored
+      - meta_story
+    briefs_generated: 2
+    generated_at: "2026-03-26T16:02:00Z"
+
+# ─── Quality Bar ────────────────────────────────────────────
+quality_bar: >
+  Each brief must be immediately actionable: a designer or AI image tool should
+  be able to execute the visual without a follow-up brief. visual_description must
+  name specific layout regions, element sizes, colours (hex), and relationships
+  between elements — not just adjectives ("vibrant", "dynamic") without
+  corresponding specifics. Color palettes must be internally consistent across
+  all briefs in a batch (same brand colours, adapted for each format's background
+  treatment). do_not_include must always include at minimum: competitor exclusions
+  and at least one generic stock photography archetype to avoid.
+
+# ─── Acceptance Criteria ────────────────────────────────────
+acceptance_criteria:
+  - Exactly one brief object per requested platform key, in request order.
+  - briefs_generated in metadata matches len(content_props.platforms).
+  - Every brief contains all required fields: platform_key, concept_name, intended_use, dimensions, visual_description, color_palette, mood, style_reference, do_not_include.
+  - dimensions.width_px, dimensions.height_px, and dimensions.aspect_ratio match the platform_formats reference for each platform_key.
+  - visual_description is ≥50 words per brief.
+  - color_palette contains all 5 hex fields with valid hex notation (#RRGGBB).
+  - do_not_include contains ≥2 items per brief.
+  - text_overlay is populated for meta_story and linkedin_carousel platform_keys.
+  - Color palette is visually consistent across all briefs in a batch (same primary/secondary/accent, background may differ by format).
+  - Output parses as valid JSON conforming to output_schema.
+  - generation_metadata.platforms_requested matches content_props.platforms.
