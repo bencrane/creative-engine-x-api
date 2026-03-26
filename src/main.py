@@ -42,11 +42,13 @@ from src.routing.router import router as generate_router
 from src.brand.router import router as brand_router
 from src.jobs.router import router as jobs_router
 from src.auth.router import router as auth_router
+from src.landing_pages.router import router as landing_pages_router
 
 app.include_router(generate_router)
 app.include_router(brand_router)
 app.include_router(jobs_router)
 app.include_router(auth_router)
+app.include_router(landing_pages_router)
 
 
 @app.get("/health")
