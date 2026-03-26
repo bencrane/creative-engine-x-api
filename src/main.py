@@ -16,9 +16,11 @@ from src.shared.errors import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: init DB pool, load specs (wired in CEX-2 / CEX-4)
+    from src.db import close_pool, init_pool
+
+    await init_pool()
     yield
-    # Shutdown: close DB pool
+    await close_pool()
 
 
 app = FastAPI(title="creative-engine-x-api", lifespan=lifespan)
