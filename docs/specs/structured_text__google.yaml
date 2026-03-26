@@ -1,0 +1,446 @@
+# ============================================================
+# creative-engine-x — Spec: Google Responsive Search Ad (RSA) Copy
+# Generated: 2026-03-26 | Version: 1.0
+# Source audit: Section 2.3 (Ad Copy character limits)
+# ============================================================
+
+spec_id: structured_text__google
+artifact_type: structured_text
+surface: google_rsa
+version: "1.0"
+description: >
+  Generates a complete Google Responsive Search Ad (RSA) asset set in a single
+  request. Google RSA allows up to 15 headlines and 4 descriptions; Google's
+  machine learning then tests combinations at serve time. This spec generates
+  10 headlines, 4 descriptions, 2 display-path options, and pinning suggestions
+  indicating which headlines are strongest for fixed positions 1, 2, and 3.
+  All fields are hard-constrained by Google's API limits and validated after
+  generation. Unlike LinkedIn/Meta ad copy, RSA does not use a multi-variant
+  model — the RSA asset set itself provides coverage through Google's combinatorial
+  testing. One RSA asset set is returned per request.
+
+# ─── Constraints ────────────────────────────────────────────
+constraints:
+  hard:
+    headlines:
+      max_chars_each: 30
+      min_count: 3
+      max_count: 15
+      generated_count: 10
+      enforcement: auto_truncate_word_boundary
+      note: >
+        Each headline must be ≤30 chars. Google will reject any headline
+        over this limit. validate_ad_copy_limits is applied per headline.
+        Headlines must be capitalized in Title Case unless a specific
+        brand convention is passed via brand_context.
+    descriptions:
+      max_chars_each: 90
+      min_count: 2
+      max_count: 4
+      generated_count: 4
+      enforcement: auto_truncate_word_boundary
+      note: >
+        Each description must be ≤90 chars. Google shows 2 descriptions
+        simultaneously; 4 gives the algorithm coverage across intents.
+    path1:
+      max_chars: 15
+      enforcement: auto_truncate_word_boundary
+      note: >
+        Display URL path segment appended after the domain.
+        Example: acme.com/AI-Forecasting. Lowercase-slug recommended.
+    path2:
+      max_chars: 15
+      enforcement: auto_truncate_word_boundary
+      note: >
+        Second path segment. Example: acme.com/AI-Forecasting/Free-Trial.
+        Optional but recommended for specificity.
+
+  soft:
+    headlines:
+      note: >
+        Aim to spread keywords across multiple headlines, not concentrate
+        them all in one. At least 3 headlines should include a primary keyword
+        from content_props.keywords.
+    descriptions:
+      note: >
+        At least one description should contain a strong CTA. At least one
+        should include a proof point or differentiator.
+    paths:
+      note: >
+        Paths should reflect the landing page URL theme and keyword intent,
+        not generic terms like "page" or "site".
+
+  validation_pattern: validate_ad_copy_limits
+  validation_notes: >
+    Each headline and description is individually validated via
+    validate_ad_copy_limits(field, value, hard_limit). Truncated items
+    are flagged in truncated_fields array. Truncation preserves word
+    boundaries and appends "…". Path fields are slugified (spaces → hyphens,
+    lowercase) before length validation.
+
+# ─── Pipeline ───────────────────────────────────────────────
+pipeline:
+  generator: generators.ad_copy.AdCopyGenerator
+  renderer: null
+  provider: null
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.7
+  claude_max_tokens: 2048
+  generation_strategy: >
+    Single Claude call via tool_use pattern. System prompt includes brand context
+    and keyword guidance. User prompt encodes content_props including keywords
+    list. The model is instructed to: (1) vary headline angles across benefit,
+    feature, CTA, social proof, and urgency categories; (2) ensure keyword
+    inclusion across at least 3 headlines; (3) avoid repeating phrases across
+    headlines; (4) write descriptions as complete sentences with end punctuation;
+    (5) suggest pinning rationale alongside each pinning recommendation.
+
+# ─── Delivery ───────────────────────────────────────────────
+delivery:
+  mode: sync
+  output_format: application/json
+  storage: null    # inline JSON stored in generated_assets.content_json column
+  asset_type_enum: ad_copy
+  surface_tag: google_rsa
+
+# ─── Content Props Schema ───────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    topic:
+      type: string
+      description: >
+        The campaign theme or product being advertised.
+        Examples: "AI sales forecasting tool", "B2B project management software".
+      maxLength: 300
+
+    value_proposition:
+      type: string
+      description: >
+        The primary outcome or differentiator to convey.
+        Examples: "95% forecast accuracy with zero code", "Save 10 hrs/week on reporting".
+      maxLength: 500
+
+    target_audience:
+      type: string
+      description: >
+        Who the ad is targeting. Informs messaging angle and vocabulary.
+        Examples: "Revenue operations managers", "Small business owners".
+      maxLength: 300
+
+    landing_page_url:
+      type: string
+      description: >
+        The destination URL. Used to derive path1/path2 suggestions and
+        to ensure copy aligns with landing page messaging.
+        Example: "https://acme.com/ai-sales-forecasting"
+      format: uri
+      maxLength: 500
+
+    keywords:
+      type: array
+      description: >
+        List of target search keywords or phrases this RSA is optimized for.
+        At least 3 headlines should naturally incorporate keywords from this list.
+        Providing 3–8 keywords yields the best coverage.
+      items:
+        type: string
+        maxLength: 80
+      minItems: 1
+      maxItems: 20
+
+    cta_text:
+      type: string
+      description: >
+        CTA phrase to include in at least one headline and at least one description.
+        Examples: "Start Free Trial", "Book a Demo", "Get a Quote".
+      maxLength: 60
+
+  required:
+    - topic
+    - value_proposition
+    - target_audience
+    - landing_page_url
+    - keywords
+    - cta_text
+
+# ─── Output Schema ──────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    headlines:
+      type: array
+      minItems: 10
+      maxItems: 10
+      items:
+        type: object
+        properties:
+          index:
+            type: integer
+            description: 1-based index (1–10).
+          text:
+            type: string
+            description: Headline text. ≤30 chars after validation.
+          char_count:
+            type: integer
+          category:
+            type: string
+            description: >
+              Angle category assigned by the generator.
+              Allowed values: keyword_match, benefit, feature, cta,
+              social_proof, urgency, brand.
+            enum:
+              - keyword_match
+              - benefit
+              - feature
+              - cta
+              - social_proof
+              - urgency
+              - brand
+          truncated:
+            type: boolean
+        required:
+          - index
+          - text
+          - char_count
+          - category
+          - truncated
+
+    descriptions:
+      type: array
+      minItems: 4
+      maxItems: 4
+      items:
+        type: object
+        properties:
+          index:
+            type: integer
+            description: 1-based index (1–4).
+          text:
+            type: string
+            description: Description text. ≤90 chars after validation.
+          char_count:
+            type: integer
+          focus:
+            type: string
+            description: >
+              Primary messaging focus of this description.
+              Allowed values: cta, proof_point, differentiator, objection_handling.
+            enum:
+              - cta
+              - proof_point
+              - differentiator
+              - objection_handling
+          truncated:
+            type: boolean
+        required:
+          - index
+          - text
+          - char_count
+          - focus
+          - truncated
+
+    paths:
+      type: object
+      description: Two display-path options as objects for flexibility.
+      properties:
+        option_a:
+          type: object
+          properties:
+            path1:
+              type: string
+              description: First path segment. ≤15 chars after slugification.
+            path2:
+              type: string
+              description: Second path segment. ≤15 chars after slugification.
+            char_counts:
+              type: object
+              properties:
+                path1: { type: integer }
+                path2: { type: integer }
+        option_b:
+          type: object
+          properties:
+            path1: { type: string }
+            path2: { type: string }
+            char_counts:
+              type: object
+              properties:
+                path1: { type: integer }
+                path2: { type: integer }
+      required:
+        - option_a
+        - option_b
+
+    pinning_suggestions:
+      type: object
+      description: >
+        Recommendations for which headlines to pin to fixed positions.
+        Pinned headlines always appear in that slot regardless of Google's
+        rotation. Use sparingly — over-pinning reduces RSA performance.
+      properties:
+        position_1:
+          type: object
+          description: Headline pinned to the first/leftmost position.
+          properties:
+            headline_index: { type: integer }
+            headline_text: { type: string }
+            rationale: { type: string }
+          required:
+            - headline_index
+            - headline_text
+            - rationale
+        position_2:
+          type: object
+          description: Headline pinned to the second position.
+          properties:
+            headline_index: { type: integer }
+            headline_text: { type: string }
+            rationale: { type: string }
+          required:
+            - headline_index
+            - headline_text
+            - rationale
+        position_3:
+          type: object
+          description: Headline pinned to the third position (optional but recommended for CTA).
+          properties:
+            headline_index: { type: integer }
+            headline_text: { type: string }
+            rationale: { type: string }
+          required:
+            - headline_index
+            - headline_text
+            - rationale
+        warning:
+          type: string
+          description: >
+            Static advisory: "Pinning more than 1–2 headlines significantly reduces
+            Google's ability to optimise RSA performance. Pin only if brand/legal
+            compliance requires a specific message in a specific slot."
+      required:
+        - position_1
+        - position_2
+        - position_3
+        - warning
+
+    truncated_fields:
+      type: array
+      description: >
+        List of field identifiers where hard truncation was applied.
+        Format: "headlines[{index}]", "descriptions[{index}]", "paths.option_a.path1", etc.
+      items: { type: string }
+
+    generation_metadata:
+      type: object
+      properties:
+        model: { type: string }
+        surface: { type: string, const: google_rsa }
+        headlines_generated: { type: integer, const: 10 }
+        descriptions_generated: { type: integer, const: 4 }
+        generated_at: { type: string, format: date-time }
+
+  required:
+    - headlines
+    - descriptions
+    - paths
+    - pinning_suggestions
+    - truncated_fields
+    - generation_metadata
+
+# ─── Example Request ────────────────────────────────────────
+example_request:
+  content_props:
+    topic: "AI sales forecasting software"
+    value_proposition: "Predict revenue within 5% accuracy using CRM data — no code required"
+    target_audience: "B2B RevOps and VP Sales leaders"
+    landing_page_url: "https://acme.com/ai-sales-forecasting"
+    keywords:
+      - "sales forecasting software"
+      - "revenue forecasting tool"
+      - "AI sales prediction"
+      - "CRM forecasting"
+      - "B2B revenue forecast"
+    cta_text: "Start Free Trial"
+  brand_context:
+    company_name: "Acme Analytics"
+    brand_voice: "Direct, data-driven, confident."
+
+# ─── Example Response ───────────────────────────────────────
+example_response:
+  headlines:
+    - { index: 1, text: "AI Sales Forecasting Tool", char_count: 25, category: "keyword_match", truncated: false }
+    - { index: 2, text: "Predict Revenue Within 5%", char_count: 25, category: "benefit", truncated: false }
+    - { index: 3, text: "No Code. No Data Team.", char_count: 22, category: "feature", truncated: false }
+    - { index: 4, text: "Start Your Free Trial Today", char_count: 27, category: "cta", truncated: false }
+    - { index: 5, text: "Trusted by 500+ RevOps Teams", char_count: 28, category: "social_proof", truncated: false }
+    - { index: 6, text: "CRM Forecasting Made Simple", char_count: 27, category: "keyword_match", truncated: false }
+    - { index: 7, text: "Close Q4 With Confidence", char_count: 24, category: "urgency", truncated: false }
+    - { index: 8, text: "Revenue Forecast in Minutes", char_count: 27, category: "benefit", truncated: false }
+    - { index: 9, text: "Acme Analytics — Try Free", char_count: 25, category: "brand", truncated: false }
+    - { index: 10, text: "B2B Revenue Forecast Tool", char_count: 25, category: "keyword_match", truncated: false }
+
+  descriptions:
+    - { index: 1, text: "Connect your CRM and get a revenue forecast accurate within 5%. No code or data team needed.", char_count: 91, focus: "differentiator", truncated: true }
+    - { index: 2, text: "Join 500+ B2B sales teams using Acme to forecast revenue and hit targets. Start free today.", char_count: 91, focus: "proof_point", truncated: false }
+    - { index: 3, text: "Start your free trial in under 10 minutes. Accurate forecasts. Cancel anytime.", char_count: 78, focus: "cta", truncated: false }
+    - { index: 4, text: "Stop defending inaccurate forecasts. Acme Analytics gives you 95% accuracy — guaranteed.", char_count: 89, focus: "objection_handling", truncated: false }
+
+  paths:
+    option_a:
+      path1: "AI-Forecasting"
+      path2: "Free-Trial"
+      char_counts: { path1: 14, path2: 10 }
+    option_b:
+      path1: "Sales-Forecast"
+      path2: "Try-Free"
+      char_counts: { path1: 14, path2: 8 }
+
+  pinning_suggestions:
+    position_1:
+      headline_index: 1
+      headline_text: "AI Sales Forecasting Tool"
+      rationale: "Strongest keyword match for primary search intent. Anchors the ad topic immediately."
+    position_2:
+      headline_index: 2
+      headline_text: "Predict Revenue Within 5%"
+      rationale: "Delivers the core value proposition in position 2, where users look after reading the topic headline."
+    position_3:
+      headline_index: 4
+      headline_text: "Start Your Free Trial Today"
+      rationale: "CTA in position 3 creates a logical flow: Topic → Benefit → Action. Useful if CTR data shows free-trial searchers dominate."
+    warning: "Pinning more than 1–2 headlines significantly reduces Google's ability to optimise RSA performance. Pin only if brand/legal compliance requires a specific message in a specific slot."
+
+  truncated_fields:
+    - "descriptions[1]"
+
+  generation_metadata:
+    model: "claude-sonnet-4-20250514"
+    surface: "google_rsa"
+    headlines_generated: 10
+    descriptions_generated: 4
+    generated_at: "2026-03-26T16:02:00Z"
+
+# ─── Quality Bar ────────────────────────────────────────────
+quality_bar: >
+  Headlines must span at least 5 distinct categories (keyword_match, benefit,
+  feature, cta, social_proof/urgency/brand) — no single category may account
+  for more than 3 of the 10 headlines. No two headlines may share the same
+  opening word. Descriptions must be complete sentences ending in punctuation.
+  All four descriptions must be substantively different — no phrase-level
+  repetition across descriptions. Path suggestions must be clean URL-safe slugs
+  derived from the landing_page_url theme and target keywords.
+
+# ─── Acceptance Criteria ────────────────────────────────────
+acceptance_criteria:
+  - Exactly 10 headlines and 4 descriptions returned.
+  - Every headline ≤30 chars after validate_ad_copy_limits.
+  - Every description ≤90 chars after validate_ad_copy_limits.
+  - path1 and path2 in both path options ≤15 chars after slugification.
+  - truncated_fields accurately identifies all truncated items using format "headlines[{n}]" / "descriptions[{n}]".
+  - pinning_suggestions provides position_1, position_2, and position_3 each referencing a valid headline_index (1–10).
+  - headline categories span at least 5 distinct enum values.
+  - At least one headline and one description include the cta_text intent.
+  - At least 3 headlines naturally incorporate keywords from content_props.keywords.
+  - Output parses as valid JSON conforming to output_schema.
+  - generation_metadata.surface is always "google_rsa".
