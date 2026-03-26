@@ -1,0 +1,363 @@
+spec_id: video__generic
+artifact_type: video
+surface: generic   # platform-agnostic — explainers, product demos, social clips, testimonials
+version: "1.0"
+description: >
+  General-purpose video spec for non-platform-specific video production:
+  explainer videos, product demos, social clips, and testimonial highlights.
+  No platform policy constraints apply. Supports multiple aspect ratios and
+  longer durations (up to 120 s). Rendering is performed via Remotion Lambda
+  (async), stored in S3, then copied to Supabase Storage. Claude Sonnet
+  generates a structured scene plan when scenes are not pre-supplied.
+
+# ─────────────────────────────────────────────
+# SUBTYPES
+# ─────────────────────────────────────────────
+subtypes:
+  explainer:
+    description: >
+      Educational walkthrough of a concept, product, or process. Typically
+      narration-driven with animated diagrams or text callouts. Common durations
+      60-120 s.
+    recommended_duration_seconds: [60, 90, 120]
+    typical_scene_count: 5-8
+
+  social_clip:
+    description: >
+      Short punchy clip for organic or paid social distribution (non-TikTok,
+      non-Meta-specific). Hook-first structure. Common durations 15-30 s.
+    recommended_duration_seconds: [15, 30]
+    typical_scene_count: 3-5
+
+  product_demo:
+    description: >
+      Screen recording or animated walkthrough of a product's key feature.
+      May include annotated UI overlays and feature callouts. Common 30-90 s.
+    recommended_duration_seconds: [30, 60, 90]
+    typical_scene_count: 4-7
+
+  testimonial_highlight:
+    description: >
+      Short-form social proof clip featuring a customer quote or metric.
+      Quote cards, customer logo, and stat overlays. Common 15-30 s.
+    recommended_duration_seconds: [15, 30]
+    typical_scene_count: 2-4
+
+# ─────────────────────────────────────────────
+# CONSTRAINTS
+# ─────────────────────────────────────────────
+constraints:
+  hard:
+    codec: h264                   # mp4 container; h265/av1 not available on Lambda
+    fps: 30
+    supported_durations_seconds: [15, 30, 60, 90, 120]
+    supported_aspect_ratios:
+      widescreen: "16:9"          # 1920×1080 (default)
+      square: "1:1"               # 1080×1080
+      vertical: "9:16"            # 1080×1920
+    default_aspect_ratio: "16:9"
+    remotion_codec: h264
+    no_h265: true
+    no_av1: true
+    no_platform_specific_rules: true
+
+  soft:
+    min_resolution_recommendation: 1080p
+    text_legibility: true         # overlays must be readable at target display size
+    scene_pacing_seconds_per_scene_min: 3   # avoid cuts faster than 3 s for generic content
+    branding_recommended: true    # logo/brand mark in opening or closing sequence
+
+# ─────────────────────────────────────────────
+# PIPELINE
+# ─────────────────────────────────────────────
+pipeline:
+  generator: video_script         # Claude Sonnet → structured scene plan JSON
+  renderer: video_renderer        # Remotion Lambda → renders frames → MP4 on S3
+  provider: remotion_provider     # wraps renderMediaOnLambda() + getRenderProgress()
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.65        # balanced creativity + structure for explainers/demos
+
+  steps:
+    1_script_generation:
+      description: >
+        If content_props.scenes is not provided, call Claude Sonnet (video_script
+        generator) to produce a scene plan tailored to the subtype. Explainers
+        get educational pacing; social_clips get hook-first structure; product_demos
+        get feature-sequence structure; testimonial_highlights get quote-card layout.
+      condition: scenes not provided in content_props
+      output_schema:
+        scenes:
+          type: array
+          items:
+            scene_index: integer
+            duration_seconds: number
+            scene_type: string        # intro | content | feature | quote | cta | outro
+            headline: string
+            body_text: string
+            visual_direction: string
+            annotation_text: string | null  # for product_demo callouts
+            cta: string | null
+
+    2_composition_resolution:
+      description: >
+        Resolve composition id from (aspect_ratio, duration) pair.
+        durationInFrames = fps × duration_seconds = 30 × duration_seconds.
+
+    3_remotion_render:
+      description: >
+        Call renderMediaOnLambda() with resolved composition, inputProps
+        containing scene plan + brand_assets, codec h264.
+      remotion_call: renderMediaOnLambda
+      params:
+        region: us-east-1
+        functionName: remotion-render-fn
+        serveUrl: "https://s3.amazonaws.com/<bucket>/remotion-bundle/index.html"
+        composition: generic_video_<aspect_ratio_slug>  # e.g. generic_video_16x9
+        codec: h264
+        framesPerLambda: 20
+        privacy: private
+        webhook:
+          url: "https://api.creative-engine-x.internal/webhooks/remotion"
+          secret: "${REMOTION_WEBHOOK_SECRET}"
+
+    4_progress_polling:
+      description: >
+        Poll getRenderProgress(renderId) every 5 s until progress = 1.0 or
+        webhook fires. Max 200 concurrent Lambda workers.
+      poll_interval_seconds: 5
+      timeout_seconds: 900        # extended timeout for 120 s renders
+
+    5_asset_copy:
+      description: >
+        On completion, copy S3 URL to Supabase Storage bucket "assets".
+        Insert/update generated_assets with content_url, status=completed.
+
+# ─────────────────────────────────────────────
+# REMOTION COMPOSITIONS
+# ─────────────────────────────────────────────
+remotion_compositions:
+  - id: generic_video_16x9
+    width: 1920
+    height: 1080
+    fps: 30
+    durationInFrames: 450   # default 15s; overridden by inputProps at render time
+
+  - id: generic_video_1x1
+    width: 1080
+    height: 1080
+    fps: 30
+    durationInFrames: 450
+
+  - id: generic_video_9x16
+    width: 1080
+    height: 1920
+    fps: 30
+    durationInFrames: 450
+
+  # durationInFrames formula: fps × duration_seconds
+  # 15s=450, 30s=900, 60s=1800, 90s=2700, 120s=3600
+
+# ─────────────────────────────────────────────
+# DELIVERY
+# ─────────────────────────────────────────────
+delivery:
+  mode: async
+  output_format: video/mp4
+  storage: supabase
+  bucket: assets
+  path_template: "videos/generic/{organization_id}/{asset_id}.mp4"
+  webhook_on_complete: true
+
+# ─────────────────────────────────────────────
+# CONTENT PROPS SCHEMA
+# ─────────────────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    duration:
+      type: integer
+      enum: [15, 30, 60, 90, 120]
+      description: Video duration in seconds.
+
+    aspect_ratio:
+      type: string
+      enum: ["16:9", "1:1", "9:16"]
+      default: "16:9"
+      description: >
+        "16:9" = Widescreen 1920×1080 (default); "1:1" = Square 1080×1080;
+        "9:16" = Vertical 1080×1920.
+
+    subtype:
+      type: string
+      enum: [explainer, social_clip, product_demo, testimonial_highlight]
+      description: >
+        Drives Claude's scene structure and Remotion composition template
+        selection. Explainer = narration-led; social_clip = hook-first;
+        product_demo = feature walkthrough; testimonial_highlight = quote card.
+
+    topic:
+      type: string
+      description: >
+        Core subject of the video. Used by Claude for scene plan generation.
+        Example: "How our platform automates invoice reconciliation".
+
+    key_message:
+      type: string
+      description: >
+        Primary takeaway or CTA. Constrained into the scene plan and must
+        appear as on-screen text in at least one scene.
+
+    scenes:
+      type: array
+      description: >
+        Optional. Pre-defined scene plan. If provided, skips Claude generation.
+      items:
+        type: object
+        properties:
+          scene_index: {type: integer}
+          duration_seconds: {type: number}
+          scene_type: {type: string}
+          headline: {type: string}
+          body_text: {type: string}
+          visual_direction: {type: string}
+          annotation_text: {type: string, nullable: true}
+          cta: {type: string, nullable: true}
+
+    brand_assets:
+      type: object
+      description: Brand visual assets passed into Remotion inputProps.
+      properties:
+        logo_url:
+          type: string
+          format: uri
+        primary_color:
+          type: string
+          description: Hex color. Example "#1A73E8".
+        secondary_color:
+          type: string
+        font_family:
+          type: string
+        background_url:
+          type: string
+          format: uri
+          description: Background image or hero footage URL.
+        customer_logo_url:
+          type: string
+          format: uri
+          description: For testimonial_highlight subtype — customer company logo.
+
+    voice_over_url:
+      type: string
+      format: uri
+      description: >
+        Optional. Public URL of pre-rendered MP3/AAC narration audio.
+        Remotion mounts it as the audio source for the composition.
+
+    testimonial:
+      type: object
+      description: >
+        Required when subtype=testimonial_highlight. Customer quote and attribution.
+      properties:
+        quote:
+          type: string
+          description: The customer quote text.
+        customer_name:
+          type: string
+        customer_title:
+          type: string
+        metric:
+          type: string
+          description: >
+            Optional stat callout. Example "3× faster onboarding".
+
+  required:
+    - duration
+    - aspect_ratio
+    - subtype
+    - topic
+    - key_message
+
+# ─────────────────────────────────────────────
+# OUTPUT SCHEMA
+# ─────────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    asset_id:
+      type: string
+      format: uuid
+    status:
+      type: string
+      enum: [queued, rendering, done, error]
+    content_url:
+      type: string
+      format: uri
+      description: Public Supabase Storage URL of the rendered MP4.
+    metadata:
+      type: object
+      properties:
+        duration_seconds: {type: number}
+        width: {type: integer}
+        height: {type: integer}
+        fps: {type: integer}
+        codec: {type: string}
+        file_size_bytes: {type: integer}
+        aspect_ratio: {type: string}
+        subtype: {type: string}
+    render_id:
+      type: string
+      description: Remotion Lambda renderId for progress polling.
+    created_at:
+      type: string
+      format: date-time
+
+# ─────────────────────────────────────────────
+# EXAMPLE REQUEST
+# ─────────────────────────────────────────────
+example_request:
+  organization_id: "org_abc123"
+  campaign_id: "camp_xyz789"
+  spec_id: video__generic
+  content_props:
+    duration: 60
+    aspect_ratio: "16:9"
+    subtype: product_demo
+    topic: "Automated invoice reconciliation in 3 steps"
+    key_message: "Eliminate manual matching — save 10 hours per week"
+    brand_assets:
+      logo_url: "https://cdn.acme.com/logo.svg"
+      primary_color: "#0F766E"
+      secondary_color: "#F0FDF4"
+      font_family: "Inter"
+
+# ─────────────────────────────────────────────
+# EXAMPLE RESPONSE
+# ─────────────────────────────────────────────
+example_response:
+  asset_id: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+  status: "queued"
+  content_url: null
+  metadata: null
+  render_id: "remotion-render-ghi789"
+  created_at: "2026-03-26T16:10:00Z"
+
+# ─────────────────────────────────────────────
+# QUALITY BAR
+# ─────────────────────────────────────────────
+quality_bar: >
+  The rendered video must match the requested subtype's structural pacing:
+  explainers must flow logically from problem → solution → CTA;
+  product_demos must show each feature with clear annotated callouts;
+  testimonial_highlights must present the quote legibly as the dominant visual.
+  Text overlays must be readable at the target display size (≥20px equivalent
+  at 1080p height). No aspect-ratio artifacts or black bars.
+
+acceptance_criteria:
+  - Rendered file is H.264 MP4 at 30fps with correct dimensions for the requested aspect_ratio.
+  - Duration matches content_props.duration (±0.5 seconds tolerance).
+  - Scene count and pacing align with subtype guidelines.
+  - key_message text appears as an on-screen overlay in at least one scene.
+  - For testimonial_highlight subtype, customer quote text is the dominant visual element.
+  - For product_demo subtype, at least one annotated callout is present if annotation_text is provided.
+  - File is accessible via content_url within 60 seconds of webhook receipt.
+  - generated_assets record transitions: queued → rendering → done | error.

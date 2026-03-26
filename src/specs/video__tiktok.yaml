@@ -1,0 +1,295 @@
+spec_id: video__tiktok
+artifact_type: video
+surface: tiktok_ads   # TikTok In-Feed Ads, TopView, Branded Content
+version: "1.0"
+description: >
+  Renders short-form vertical video ads for TikTok placements. The 9:16 aspect
+  ratio is mandatory. Videos are optimised for the TikTok feed native experience:
+  strong 2-second hook, caption overlays, and vertical-native framing throughout.
+  Rendering is performed via Remotion Lambda (async), stored in S3, then copied
+  to Supabase Storage for delivery.
+
+# ─────────────────────────────────────────────
+# CONSTRAINTS
+# ─────────────────────────────────────────────
+constraints:
+  hard:
+    aspect_ratio: "9:16"           # only supported ratio; no exceptions
+    width: 1080
+    height: 1920
+    codec: h264                    # mp4 container; h265/av1 not available on Lambda
+    fps: 30
+    min_resolution: 720p           # 1080p strongly recommended
+    recommended_resolution: 1080p
+    max_file_size_mb: 500
+    min_duration_seconds: 9        # TikTok recommended floor
+    max_duration_seconds: 60
+    recommended_duration_range: [9, 15]
+    remotion_codec: h264
+    no_h265: true
+    no_av1: true
+
+  soft:
+    hook_window_seconds: 2         # hook (visual + text) must land within first 2 s
+    captions_required: true        # auto-captions or burned-in subtitles
+    vertical_native_framing: true  # no horizontal crops, no letterboxing
+    ugc_aesthetic_optional: true   # raw/authentic look performs well for UGC subtype
+    trending_audio_optional: true  # background audio track can be injected if available
+    safe_zone_top_percent: 10      # TikTok UI elements cover top ~10%
+    safe_zone_bottom_percent: 25   # CTA bar + progress bar in bottom ~25%
+    cta_placement: last_5s
+
+# ─────────────────────────────────────────────
+# PIPELINE
+# ─────────────────────────────────────────────
+pipeline:
+  generator: video_script          # Claude Sonnet → structured scene plan JSON
+  renderer: video_renderer         # Remotion Lambda → renders frames → MP4 on S3
+  provider: remotion_provider      # wraps renderMediaOnLambda() + getRenderProgress()
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.75         # slightly elevated for punchy/creative TikTok hooks
+
+  steps:
+    1_script_generation:
+      description: >
+        Claude Sonnet generates a TikTok-native scene plan: energetic opening hook
+        in ≤2 s, rapid scene pacing (~2-4 s per scene), caption text per scene,
+        and a direct-response CTA in the final 3 s. Style adapts to the requested
+        style parameter (ugc / polished / mixed).
+      condition: scenes not provided in content_props
+      output_schema:
+        scenes:
+          type: array
+          items:
+            scene_index: integer
+            duration_seconds: number
+            caption_text: string      # burned-in caption for this scene
+            visual_direction: string  # camera framing, motion, color cues
+            on_screen_text: string    # bold headline overlay if different from caption
+            cta: string | null
+
+    2_remotion_render:
+      description: >
+        Call renderMediaOnLambda() with composition tiktok_video_ad (9:16, 1080×1920),
+        codec h264, and inputProps containing the scene plan + brand_assets.
+      remotion_call: renderMediaOnLambda
+      params:
+        region: us-east-1
+        functionName: remotion-render-fn
+        serveUrl: "https://s3.amazonaws.com/<bucket>/remotion-bundle/index.html"
+        composition: tiktok_video_ad
+        codec: h264
+        framesPerLambda: 20
+        privacy: private
+        webhook:
+          url: "https://api.creative-engine-x.internal/webhooks/remotion"
+          secret: "${REMOTION_WEBHOOK_SECRET}"
+
+    3_progress_polling:
+      description: >
+        Poll getRenderProgress(renderId) every 5 s until progress = 1.0 or webhook fires.
+        Update job status: queued → rendering → done | error.
+      poll_interval_seconds: 5
+      timeout_seconds: 600
+
+    4_asset_copy:
+      description: >
+        On completion, copy S3 output URL to Supabase Storage bucket "assets".
+        Insert/update generated_assets record with content_url, status=completed.
+
+# ─────────────────────────────────────────────
+# REMOTION COMPOSITION SPEC
+# ─────────────────────────────────────────────
+remotion_compositions:
+  - id: tiktok_video_ad
+    width: 1080
+    height: 1920
+    fps: 30
+    durationInFrames: 300   # 10s default; overridden at render time via inputProps
+    # durationInFrames = fps × duration_seconds (e.g. 15s = 450 frames)
+
+# ─────────────────────────────────────────────
+# DELIVERY
+# ─────────────────────────────────────────────
+delivery:
+  mode: async
+  output_format: video/mp4
+  storage: supabase
+  bucket: assets
+  path_template: "videos/tiktok/{organization_id}/{asset_id}.mp4"
+  webhook_on_complete: true
+
+# ─────────────────────────────────────────────
+# CONTENT PROPS SCHEMA
+# ─────────────────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    duration:
+      type: integer
+      description: >
+        Video duration in seconds. Recommended 9-15; max 60.
+        Must be ≥9 and ≤60.
+      minimum: 9
+      maximum: 60
+      default: 15
+
+    topic:
+      type: string
+      description: >
+        The core subject or offer. Used by Claude to write the scene plan.
+        Example: "SaaS tool that saves sales teams 5 hours/week".
+
+    key_message:
+      type: string
+      description: >
+        Single primary value prop or CTA. Constrained into every scene plan
+        and must appear as on-screen text in at least one scene.
+
+    style:
+      type: string
+      enum: [ugc, polished, mixed]
+      default: mixed
+      description: >
+        Aesthetic direction for Claude's visual prompts and Remotion component selection.
+        ugc = raw, handheld, low-fi; polished = branded, motion graphics, clean;
+        mixed = natural footage with branded overlays.
+
+    include_captions:
+      type: boolean
+      default: true
+      description: >
+        When true, each scene includes a caption_text overlay rendered into
+        the video. Required for TikTok accessibility and sound-off engagement.
+
+    scenes:
+      type: array
+      description: >
+        Optional. If provided, bypasses Claude script generation.
+      items:
+        type: object
+        properties:
+          scene_index: {type: integer}
+          duration_seconds: {type: number}
+          caption_text: {type: string}
+          visual_direction: {type: string}
+          on_screen_text: {type: string}
+          cta: {type: string, nullable: true}
+
+    brand_assets:
+      type: object
+      description: Brand-level visual assets passed into Remotion inputProps.
+      properties:
+        logo_url:
+          type: string
+          format: uri
+        primary_color:
+          type: string
+          description: Hex color for brand overlays. Example "#FF0050" (TikTok-native red).
+        secondary_color:
+          type: string
+        font_family:
+          type: string
+        background_url:
+          type: string
+          format: uri
+          description: Optional hero footage or image for scene backgrounds.
+
+    audio_track_url:
+      type: string
+      format: uri
+      description: >
+        Optional. URL of a background music or trending audio file (MP3/AAC).
+        Remotion mixes this as the background audio track. Note: TikTok's
+        platform may replace audio with licensed tracks on organic posts;
+        for paid ads use licensed tracks only.
+
+  required:
+    - duration
+    - topic
+    - key_message
+
+# ─────────────────────────────────────────────
+# OUTPUT SCHEMA
+# ─────────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    asset_id:
+      type: string
+      format: uuid
+    status:
+      type: string
+      enum: [queued, rendering, done, error]
+    content_url:
+      type: string
+      format: uri
+      description: Public Supabase Storage URL of the rendered MP4.
+    metadata:
+      type: object
+      properties:
+        duration_seconds: {type: number}
+        width: {type: integer}     # always 1080
+        height: {type: integer}    # always 1920
+        fps: {type: integer}       # always 30
+        codec: {type: string}      # always h264
+        file_size_bytes: {type: integer}
+        aspect_ratio: {type: string}  # always "9:16"
+        captions_included: {type: boolean}
+        style: {type: string}
+    render_id:
+      type: string
+      description: Remotion Lambda renderId for progress polling.
+    created_at:
+      type: string
+      format: date-time
+
+# ─────────────────────────────────────────────
+# EXAMPLE REQUEST
+# ─────────────────────────────────────────────
+example_request:
+  organization_id: "org_abc123"
+  campaign_id: "camp_xyz789"
+  spec_id: video__tiktok
+  content_props:
+    duration: 15
+    topic: "AI writing tool that cuts blog time from 4 hours to 20 minutes"
+    key_message: "Try free — publish your first post today"
+    style: mixed
+    include_captions: true
+    brand_assets:
+      logo_url: "https://cdn.acme.com/logo.svg"
+      primary_color: "#7C3AED"
+      secondary_color: "#FFFFFF"
+      font_family: "Inter"
+
+# ─────────────────────────────────────────────
+# EXAMPLE RESPONSE
+# ─────────────────────────────────────────────
+example_response:
+  asset_id: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+  status: "queued"
+  content_url: null
+  metadata: null
+  render_id: "remotion-render-def456"
+  created_at: "2026-03-26T16:05:00Z"
+
+# ─────────────────────────────────────────────
+# QUALITY BAR
+# ─────────────────────────────────────────────
+quality_bar: >
+  The rendered video must open with a strong visual/text hook within the first
+  2 seconds. All caption text must be legible on mobile at standard TikTok
+  playback size (≥22px equivalent at 1920 height), positioned within the safe
+  zone (between 10% and 75% from the top). No horizontal letterboxing. File
+  size must stay under 500 MB. The CTA must appear in the final 3-5 seconds.
+
+acceptance_criteria:
+  - Rendered file is H.264 MP4, 9:16 (1080×1920), 30fps.
+  - Duration matches content_props.duration (±0.5 seconds tolerance).
+  - Caption overlay present on every scene when include_captions=true.
+  - Hook text or bold visual statement appears within first 2 seconds of playback.
+  - All text elements fall within the TikTok UI safe zones (top 10%, bottom 25% clear).
+  - File size does not exceed 500 MB.
+  - Asset accessible via content_url within 60 seconds of webhook receipt.
+  - generated_assets record transitions: queued → rendering → done | error.

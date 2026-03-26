@@ -1,0 +1,278 @@
+# ============================================================
+# creative-engine-x — Spec: LinkedIn Ad Copy
+# Generated: 2026-03-26 | Version: 1.0
+# Source audit: Section 2.3 (Ad Copy character limits)
+# ============================================================
+
+spec_id: structured_text__linkedin
+artifact_type: structured_text
+surface: linkedin
+version: "1.0"
+description: >
+  Generates LinkedIn Sponsored Content ad copy in sets of 3 variants per request.
+  Each variant contains introductory_text (the main post body visible in feed),
+  headline (bold text below the creative image), and description (sub-headline shown
+  in some placements). Hard character limits are enforced via post-generation
+  truncation at word boundaries; soft limits reflect LinkedIn's recommended
+  visible-above-the-fold thresholds. All three fields are generated simultaneously
+  by a single Claude Sonnet call using the tool_use structured-output pattern.
+
+# ─── Constraints ────────────────────────────────────────────
+constraints:
+  hard:
+    introductory_text:
+      max_chars: 600
+      enforcement: auto_truncate_word_boundary
+      note: >
+        LinkedIn will reject submissions that exceed 600 chars.
+        The validate_ad_copy_limits pattern truncates at the last
+        complete word before the limit and appends "…" if truncated.
+    headline:
+      max_chars: 200
+      enforcement: auto_truncate_word_boundary
+    description:
+      max_chars: 100
+      enforcement: auto_truncate_word_boundary
+
+  soft:
+    introductory_text:
+      recommended_chars: 150
+      rationale: >
+        Content beyond 150 chars is hidden behind a "see more" fold on
+        desktop and mobile. Copy that delivers the hook within 150 chars
+        maximises click-through before the fold.
+    headline:
+      recommended_chars: 70
+      rationale: >
+        Headlines longer than ~70 chars are truncated in most feed
+        placements. Keeping within this range ensures the full headline
+        is visible without expanding.
+    description:
+      recommended_chars: null
+      rationale: Description is shown inconsistently; brevity is preferred.
+
+  validation_pattern: validate_ad_copy_limits
+  validation_notes: >
+    After generation, run each field through validate_ad_copy_limits(field, value,
+    hard_limit). If len(value) > hard_limit, truncate to the last word boundary
+    at or before hard_limit and append "…". Log a warning with the field name,
+    original length, and truncated length. Soft-limit overruns are annotated in
+    the response metadata but do NOT cause truncation.
+
+# ─── Pipeline ───────────────────────────────────────────────
+pipeline:
+  generator: generators.ad_copy.AdCopyGenerator
+  renderer: null         # JSON output only — no HTML/PDF rendering step
+  provider: null         # no external media provider
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.7
+  claude_max_tokens: 1024
+  generation_strategy: >
+    Single Claude call via tool_use pattern. System prompt carries brand context
+    (AssetContext: company_name, brand_voice, value_proposition, icp_definition).
+    User prompt encodes content_props. Tool schema enforces the output structure.
+    All 3 variants are generated in a single response to reduce latency.
+
+# ─── Delivery ───────────────────────────────────────────────
+delivery:
+  mode: sync
+  output_format: application/json
+  storage: null    # inline JSON stored in generated_assets.content_json column
+  asset_type_enum: ad_copy
+  surface_tag: linkedin
+
+# ─── Content Props Schema ───────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    topic:
+      type: string
+      description: >
+        The subject matter or campaign theme for the ad.
+        Examples: "Q2 demand-gen campaign", "product launch — AI analytics",
+        "upcoming webinar: scaling B2B sales".
+      maxLength: 300
+
+    value_proposition:
+      type: string
+      description: >
+        The core benefit or differentiator to communicate. Should be specific
+        and outcome-oriented.
+        Examples: "Cut reporting time by 80% with automated dashboards",
+        "Get pipeline-ready leads without manual prospecting".
+      maxLength: 500
+
+    target_audience:
+      type: string
+      description: >
+        The persona or segment the ad should resonate with.
+        Examples: "VP of Marketing at Series B SaaS companies",
+        "Revenue Operations managers in mid-market B2B".
+      maxLength: 300
+
+    cta_text:
+      type: string
+      description: >
+        The desired call-to-action phrase to include or echo in copy.
+        Examples: "Download the guide", "Book a demo", "Start free trial".
+      maxLength: 100
+
+    tone:
+      type: string
+      description: >
+        Optional tone modifier. Overrides the brand_voice default when provided.
+        Allowed values: professional, conversational, urgent, inspirational,
+        authoritative, playful.
+      enum:
+        - professional
+        - conversational
+        - urgent
+        - inspirational
+        - authoritative
+        - playful
+      nullable: true
+
+  required:
+    - topic
+    - value_proposition
+    - target_audience
+    - cta_text
+
+# ─── Output Schema ──────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    variants:
+      type: array
+      minItems: 3
+      maxItems: 3
+      items:
+        type: object
+        properties:
+          variant_index:
+            type: integer
+            description: 1-based index (1, 2, 3).
+          introductory_text:
+            type: string
+            description: Main post body. Hard limit 600 chars; soft target ≤150 chars above fold.
+          headline:
+            type: string
+            description: Bold link headline. Hard limit 200 chars; soft target ≤70 chars.
+          description:
+            type: string
+            description: Sub-headline below the headline. Hard limit 100 chars.
+          char_counts:
+            type: object
+            description: Actual character counts after any truncation.
+            properties:
+              introductory_text: { type: integer }
+              headline: { type: integer }
+              description: { type: integer }
+          soft_limit_warnings:
+            type: array
+            description: List of fields that exceeded their soft limit (informational only).
+            items: { type: string }
+          truncated_fields:
+            type: array
+            description: List of fields that were hard-truncated during validation.
+            items: { type: string }
+        required:
+          - variant_index
+          - introductory_text
+          - headline
+          - description
+          - char_counts
+          - soft_limit_warnings
+          - truncated_fields
+
+    generation_metadata:
+      type: object
+      properties:
+        model: { type: string }
+        surface: { type: string, const: linkedin }
+        variant_count: { type: integer, const: 3 }
+        generated_at: { type: string, format: date-time }
+
+  required:
+    - variants
+    - generation_metadata
+
+# ─── Example Request ────────────────────────────────────────
+example_request:
+  content_props:
+    topic: "AI-powered sales forecasting product launch"
+    value_proposition: "Predict next quarter's revenue within 5% accuracy using your existing CRM data — no data science team required."
+    target_audience: "VP of Sales and Revenue Operations leaders at B2B SaaS companies with 50–500 employees"
+    cta_text: "See a live demo"
+    tone: "authoritative"
+  brand_context:
+    company_name: "Acme Analytics"
+    brand_voice: "Direct, data-driven, and confident without being boastful."
+
+# ─── Example Response ───────────────────────────────────────
+example_response:
+  variants:
+    - variant_index: 1
+      introductory_text: "Most sales forecasts are wrong by 20–40%. That's not a data problem — it's a tooling problem. Acme Analytics connects to your CRM and delivers revenue predictions accurate to within 5%, without a single line of code."
+      headline: "Sales forecasting that's actually accurate"
+      description: "No data science team needed. See a live demo."
+      char_counts:
+        introductory_text: 214
+        headline: 43
+        description: 38
+      soft_limit_warnings:
+        - introductory_text
+      truncated_fields: []
+
+    - variant_index: 2
+      introductory_text: "Your CRM already has the data. Acme Analytics turns it into a revenue forecast accurate within 5% — in under 10 minutes of setup."
+      headline: "Predict next quarter's revenue with 95% accuracy"
+      description: "Plug in your CRM. See results today."
+      char_counts:
+        introductory_text: 138
+        headline: 49
+        description: 35
+      soft_limit_warnings: []
+      truncated_fields: []
+
+    - variant_index: 3
+      introductory_text: "RevOps leaders: stop defending inaccurate forecasts in board meetings. Acme Analytics gives you 5% revenue accuracy without hiring a data science team. See a live demo and walk away with a working model."
+      headline: "End forecast anxiety — see a live demo"
+      description: "For B2B SaaS RevOps and VP Sales."
+      char_counts:
+        introductory_text: 199
+        headline: 39
+        description: 33
+      soft_limit_warnings:
+        - introductory_text
+      truncated_fields: []
+
+  generation_metadata:
+    model: "claude-sonnet-4-20250514"
+    surface: "linkedin"
+    variant_count: 3
+    generated_at: "2026-03-26T16:02:00Z"
+
+# ─── Quality Bar ────────────────────────────────────────────
+quality_bar: >
+  Each variant must feel distinct in angle and hook — not merely paraphrased rewrites
+  of each other. Variant 1 should lead with a problem/pain, Variant 2 with a
+  benefit/outcome, and Variant 3 with a persona-direct challenge or proof point.
+  All three must include an implicit or explicit echo of cta_text. The
+  introductory_text hook (first sentence) must land within the 150-char soft limit
+  whenever the content_props permit it. No variant should repeat the same opening
+  word or phrase as another.
+
+# ─── Acceptance Criteria ────────────────────────────────────
+acceptance_criteria:
+  - Exactly 3 variants are returned in every response.
+  - introductory_text never exceeds 600 chars after validation.
+  - headline never exceeds 200 chars after validation.
+  - description never exceeds 100 chars after validation.
+  - truncated_fields accurately lists every field that was modified by validate_ad_copy_limits.
+  - soft_limit_warnings accurately lists every field where char count exceeds the soft limit.
+  - char_counts reflect post-truncation lengths.
+  - Each variant's angle is meaningfully distinct (different hook type, not just synonyms).
+  - CTA intent from cta_text is present in each variant.
+  - Output parses as valid JSON conforming to output_schema.
+  - generation_metadata.surface is always "linkedin".

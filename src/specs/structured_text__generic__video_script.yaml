@@ -1,0 +1,441 @@
+# ============================================================
+# creative-engine-x — Spec: Video Script (Generic / Structured Text)
+# Generated: 2026-03-26 | Version: 1.0
+# Source audit: Section 2.6 (Video Script generator)
+# ============================================================
+
+spec_id: structured_text__generic__video_script
+artifact_type: structured_text
+surface: generic
+subtype: video_script
+version: "1.0"
+description: >
+  Generates structured video scripts for short-form ad content in either 30-second
+  or 60-second durations. Scripts are broken into timed segments (ScriptSegment
+  objects) covering Hook, Problem, Solution, optional Proof, and CTA beats, with
+  exact word counts calibrated to natural speech rate (~150 wpm). Each segment
+  includes spoken text, duration in seconds, and a visual direction note for the
+  creative team or motion designer. Platform-specific guidance (LinkedIn, Meta,
+  YouTube) is embedded in the response for aspect ratio, tone, and caption
+  requirements. Output is JSON only — no video rendering occurs in this generator.
+  Video rendering is handled downstream by the Remotion pipeline.
+
+# ─── Duration Configurations ────────────────────────────────
+duration_configs:
+  "30s":
+    total_seconds: 30
+    target_word_count: 75
+    words_per_second: 2.5
+    segment_structure:
+      - name: hook
+        duration_seconds: 3
+        target_words: 8
+        purpose: >
+          Grab attention immediately. Should be a bold statement, question,
+          or visual gag that stops the scroll. No brand introduction yet.
+      - name: problem
+        duration_seconds: 7
+        target_words: 18
+        purpose: >
+          Articulate the pain point or tension the audience recognises.
+          Make it specific and emotional, not generic.
+      - name: solution
+        duration_seconds: 10
+        target_words: 25
+        purpose: >
+          Introduce the product/offer as the resolution to the problem.
+          Name the product, state the core benefit, show (via visual direction)
+          the key feature.
+      - name: cta
+        duration_seconds: 10
+        target_words: 24
+        purpose: >
+          Drive the specific desired action. Include the offer, urgency cue
+          if applicable, and a clear next step. End with the product name
+          or brand logo direction.
+
+  "60s":
+    total_seconds: 60
+    target_word_count: 150
+    words_per_second: 2.5
+    segment_structure:
+      - name: hook
+        duration_seconds: 3
+        target_words: 8
+        purpose: >
+          Bold opening statement or provocative question. Scroll-stopper.
+      - name: problem
+        duration_seconds: 12
+        target_words: 30
+        purpose: >
+          Expand the pain point with specifics, data, or relatable scenarios.
+          Build tension. The viewer should feel the problem before the solution
+          is revealed.
+      - name: solution
+        duration_seconds: 20
+        target_words: 50
+        purpose: >
+          Introduce the product and walk through 2–3 key capabilities that
+          resolve the stated problem. Visual direction should reference
+          product UI, demo footage, or animated diagrams.
+      - name: proof
+        duration_seconds: 15
+        target_words: 38
+        purpose: >
+          Social proof beat: customer result (stat, testimonial snippet,
+          logo wall), or before/after comparison. Adds credibility before
+          the CTA ask.
+      - name: cta
+        duration_seconds: 10
+        target_words: 24
+        purpose: >
+          Clear, direct call to action. Offer, urgency, next step.
+          Brand logo and tagline in visual direction.
+
+# ─── Platform Guidance ──────────────────────────────────────
+platform_guidance:
+  linkedin:
+    aspect_ratio: "16:9"
+    dimensions: "1920x1080 (landscape preferred for feed)"
+    tone: >
+      Professional and substantive. Viewers on LinkedIn expect insight,
+      not just entertainment. Stats and proof points carry extra weight.
+      Avoid slang; keep energy focused rather than frenetic.
+    caption_requirements: >
+      REQUIRED. LinkedIn autoplays silently by default. Every spoken word
+      must have an on-screen caption. Captions should match script text
+      verbatim. Visual direction should note "CAPTION OVERLAY" for each
+      spoken segment.
+    hook_guidance: >
+      LinkedIn hooks work best as bold text-on-screen statements. Open
+      with a counterintuitive stat or a sharp industry observation.
+
+  meta:
+    aspect_ratio: "9:16 (Stories/Reels) or 1:1 (Feed)"
+    dimensions: "1080x1920 (Stories/Reels) or 1080x1080 (Feed)"
+    tone: >
+      Energetic and visual-first. Assume silent autoplay. The hook
+      must work as a visual gag or text card before any voiceover lands.
+      Conversational, fast-paced. Can use humour.
+    caption_requirements: >
+      STRONGLY RECOMMENDED. Stories and Reels autoplay silently.
+      Captions should be styled (large, bold, centered) not just burned-in
+      subtitles. Visual direction should specify caption style and timing.
+    hook_guidance: >
+      First 2 seconds are critical for Meta retention. Use a visual
+      pattern interrupt, bold text card, or unexpected sound.
+
+  youtube:
+    aspect_ratio: "16:9"
+    dimensions: "1920x1080"
+    tone: >
+      Can afford slightly slower pace than Meta/Stories — YouTube viewers
+      have higher intent. Still must hook in under 5 seconds before
+      skip-ad button appears. More room for educational framing.
+    caption_requirements: >
+      RECOMMENDED but flexible. YouTube auto-generates captions. Manual
+      captions preferred for accuracy and SEO. Visual direction should
+      note key on-screen text moments.
+    hook_guidance: >
+      Must hook before the 5-second mark (skip-ad threshold). Start
+      with a direct value statement or provocative question. Avoid
+      logo-first openings.
+
+# ─── ScriptSegment Schema (reusable type) ───────────────────
+script_segment_schema:
+  type: object
+  properties:
+    segment_name:
+      type: string
+      description: "One of: hook, problem, solution, proof, cta"
+      enum: [hook, problem, solution, proof, cta]
+    text:
+      type: string
+      description: >
+        The spoken copy for this segment. Word count should match the
+        duration_configs target_words for the selected duration.
+    duration_seconds:
+      type: integer
+      description: Duration of this segment in seconds.
+    word_count:
+      type: integer
+      description: Actual word count of the text field.
+    visual_direction:
+      type: string
+      description: >
+        Instructions for the creative team on what should appear on screen
+        during this segment. Examples: "Show dashboard UI animating",
+        "Cut to customer testimonial B-roll", "Bold text card: '5% accuracy
+        or your money back'", "Logo and tagline fade in". Should include
+        CAPTION OVERLAY note for platforms that require it.
+  required:
+    - segment_name
+    - text
+    - duration_seconds
+    - word_count
+    - visual_direction
+
+# ─── Constraints ────────────────────────────────────────────
+constraints:
+  hard:
+    total_duration:
+      allowed_values: [30, 60]
+      enforcement: must match content_props.duration exactly
+    segment_coverage_30s:
+      required_segments: [hook, problem, solution, cta]
+      enforcement: all four segments must be present
+    segment_coverage_60s:
+      required_segments: [hook, problem, solution, proof, cta]
+      enforcement: all five segments must be present
+
+  soft:
+    word_counts:
+      note: >
+        Target word counts per segment are guidelines, not hard limits.
+        ±15% variance is acceptable. Total word count should land within
+        ±10 words of the duration_config target.
+    visual_direction:
+      note: >
+        Every segment must include at least one actionable visual direction note.
+        Generic placeholders ("B-roll here") are not acceptable.
+
+# ─── Pipeline ───────────────────────────────────────────────
+pipeline:
+  generator: generators.video_script.VideoScriptGenerator
+  renderer: null         # JSON only. Downstream: Remotion pipeline handles video rendering.
+  provider: null
+  claude_model: claude-sonnet-4-20250514
+  claude_temperature: 0.7
+  claude_max_tokens: 2048
+  generation_strategy: >
+    Single Claude call via tool_use pattern. System prompt includes brand context
+    and the platform_guidance block for the requested platform. User prompt
+    encodes content_props. The model is instructed to adhere strictly to the
+    segment structure for the requested duration, respect target word counts
+    per segment, and produce specific (not generic) visual direction notes that
+    reference the product or campaign assets.
+
+# ─── Delivery ───────────────────────────────────────────────
+delivery:
+  mode: sync
+  output_format: application/json
+  storage: null    # inline JSON stored in generated_assets.content_json column
+  asset_type_enum: video_script
+  surface_tag: generic
+
+# ─── Content Props Schema ───────────────────────────────────
+content_props_schema:
+  type: object
+  properties:
+    duration:
+      type: string
+      description: >
+        Script duration. "30s" generates a 4-segment ~75-word script.
+        "60s" generates a 5-segment ~150-word script with a Proof beat.
+      enum:
+        - "30s"
+        - "60s"
+
+    platform:
+      type: string
+      description: >
+        Target platform. Determines tone guidance, aspect ratio annotation,
+        and caption requirements in the output. "generic" skips
+        platform-specific annotations.
+      enum:
+        - linkedin
+        - meta
+        - youtube
+        - generic
+
+    topic:
+      type: string
+      description: >
+        The product, service, or campaign being promoted.
+        Examples: "AI sales forecasting software launch",
+        "Free trial offer for project management tool".
+      maxLength: 300
+
+    key_message:
+      type: string
+      description: >
+        The single most important thing the viewer should take away.
+        This should be distilled into one clear sentence.
+        Examples: "Acme Analytics predicts revenue within 5% accuracy",
+        "You can replace your spreadsheets in under 10 minutes".
+      maxLength: 500
+
+    tone:
+      type: string
+      description: >
+        Optional tone modifier. Overrides brand_voice default.
+      enum:
+        - professional
+        - conversational
+        - urgent
+        - inspirational
+        - authoritative
+        - playful
+      nullable: true
+
+  required:
+    - duration
+    - platform
+    - topic
+    - key_message
+
+# ─── Output Schema ──────────────────────────────────────────
+output_schema:
+  type: object
+  properties:
+    hook:
+      "$ref": "#/script_segment_schema"
+      description: Attention-grabbing opening segment.
+
+    body:
+      type: array
+      description: >
+        Middle segments between hook and CTA. For 30s: [problem, solution].
+        For 60s: [problem, solution, proof].
+      items:
+        "$ref": "#/script_segment_schema"
+      minItems: 2
+      maxItems: 3
+
+    cta:
+      "$ref": "#/script_segment_schema"
+      description: Final call-to-action segment.
+
+    total_word_count:
+      type: integer
+      description: >
+        Sum of word counts across all segments. Should be within ±10 words
+        of duration_config target (75 for 30s, 150 for 60s).
+
+    music_direction:
+      type: string
+      description: >
+        High-level music/audio bed guidance for the editor or motion designer.
+        Should specify energy level, genre reference, and any beat-drop or
+        silence moments aligned to segment transitions.
+        Example: "Upbeat cinematic underscore, 120bpm. Build to full energy
+        at Solution segment. Fade out under CTA voiceover."
+
+    platform_annotations:
+      type: object
+      description: >
+        Platform-specific production notes derived from platform_guidance.
+        Null if content_props.platform is "generic".
+      properties:
+        platform: { type: string }
+        aspect_ratio: { type: string }
+        dimensions: { type: string }
+        caption_required: { type: boolean }
+        caption_notes: { type: string }
+        tone_notes: { type: string }
+      nullable: true
+
+    generation_metadata:
+      type: object
+      properties:
+        model: { type: string }
+        duration: { type: string }
+        platform: { type: string }
+        target_word_count: { type: integer }
+        generated_at: { type: string, format: date-time }
+
+  required:
+    - hook
+    - body
+    - cta
+    - total_word_count
+    - music_direction
+    - generation_metadata
+
+# ─── Example Request ────────────────────────────────────────
+example_request:
+  content_props:
+    duration: "30s"
+    platform: "linkedin"
+    topic: "AI sales forecasting software — Acme Analytics"
+    key_message: "Acme Analytics predicts your revenue within 5% accuracy using only your existing CRM data — no data science team needed."
+    tone: "authoritative"
+  brand_context:
+    company_name: "Acme Analytics"
+    brand_voice: "Direct, data-driven, confident."
+
+# ─── Example Response ───────────────────────────────────────
+example_response:
+  hook:
+    segment_name: hook
+    text: "Most sales forecasts are wrong by 30%."
+    duration_seconds: 3
+    word_count: 7
+    visual_direction: "Bold white text on dark background: '30% off. Every forecast.' Cut to black. CAPTION OVERLAY."
+
+  body:
+    - segment_name: problem
+      text: "That's not a data problem — it's a tooling problem. Your CRM has everything you need. You just can't see it."
+      duration_seconds: 7
+      word_count: 20
+      visual_direction: "Split screen: chaotic spreadsheet on left, empty pipeline chart on right. Subtle red tint. CAPTION OVERLAY."
+
+    - segment_name: solution
+      text: "Acme Analytics connects to your CRM in minutes and delivers revenue forecasts accurate within 5%. No code. No data team. Just clarity."
+      duration_seconds: 10
+      word_count: 25
+      visual_direction: "Screen recording of Acme dashboard populating in real-time. Highlight the '5% accuracy' badge. Product name lower-third. CAPTION OVERLAY."
+
+  cta:
+    segment_name: cta
+    text: "See a live demo. Your forecast could be this accurate next week. Link in comments."
+    duration_seconds: 10
+    word_count: 16
+    visual_direction: "Acme Analytics logo centered on clean white background. URL: acme.com/demo. CAPTION OVERLAY. End card hold 2s."
+
+  total_word_count: 68
+  music_direction: >
+    Minimal, low-key cinematic underscore. Slow build from hook through problem.
+    Single piano note or soft percussion hit at Solution cut. Keep under voiceover —
+    do not compete. Fade to near-silence under CTA so spoken URL is clear.
+
+  platform_annotations:
+    platform: linkedin
+    aspect_ratio: "16:9"
+    dimensions: "1920x1080"
+    caption_required: true
+    caption_notes: >
+      LinkedIn autoplays silently. All segments must have captions. Use
+      standard subtitle positioning (bottom third). Match script text verbatim.
+    tone_notes: >
+      Professional and substantive. Stats and proof points carry extra weight
+      on LinkedIn. Avoid slang or frenetic energy.
+
+  generation_metadata:
+    model: "claude-sonnet-4-20250514"
+    duration: "30s"
+    platform: "linkedin"
+    target_word_count: 75
+    generated_at: "2026-03-26T16:02:00Z"
+
+# ─── Quality Bar ────────────────────────────────────────────
+quality_bar: >
+  Each segment's text must be genuinely distinct in function: the hook must be
+  provocative and not introduce the brand, the problem must name a specific pain
+  without mentioning the solution, and the CTA must include a concrete next step
+  (URL, link-in-bio, phone number, or equivalent). visual_direction notes must be
+  specific enough for a motion designer to execute without further brief — no
+  placeholders. Music direction must reference tempo, genre, and at least one
+  structural cue tied to a segment transition.
+
+# ─── Acceptance Criteria ────────────────────────────────────
+acceptance_criteria:
+  - Duration-correct segment structure: 30s has [hook, problem, solution, cta]; 60s has [hook, problem, solution, proof, cta].
+  - total_word_count is within ±10 words of duration target (75 for 30s, 150 for 60s).
+  - Every segment has a non-empty, specific visual_direction string (not a placeholder).
+  - music_direction is non-empty and includes energy/genre/structural guidance.
+  - platform_annotations is populated for all non-generic platforms with correct aspect_ratio and caption_required.
+  - Hook does not mention the brand or product name.
+  - CTA contains an actionable next step.
+  - Output parses as valid JSON conforming to output_schema.
+  - generation_metadata.duration and generation_metadata.platform match content_props inputs.
