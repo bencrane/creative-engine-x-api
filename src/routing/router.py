@@ -146,9 +146,4 @@ async def generate_batch(body: BatchGenerateRequest, request: Request) -> Any:
     )
 
 
-@router.get("/jobs/{job_id}", response_model=JobStatusResponse)
-async def get_job_status(job_id: str) -> Any:
-    # Placeholder — real implementation in CEX-9
-    from src.shared.errors import JobNotFoundError
-
-    raise JobNotFoundError(job_id)
+    # Note: GET /jobs/{job_id} is now handled by src.jobs.router
