@@ -17,8 +17,12 @@ from src.shared.errors import (
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from src.db import close_pool, init_pool
+    from src.routing.registry import registry
+    from src.specs.loader import SpecLoader
 
     await init_pool()
+    specs = SpecLoader.load_all()
+    registry.register(specs)
     yield
     await close_pool()
 
@@ -32,6 +36,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+from src.routing.router import router as generate_router
+
+app.include_router(generate_router)
 
 
 @app.get("/health")
