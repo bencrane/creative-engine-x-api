@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Letter 8.5x14 Legal - Base Scaffold</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e8e8; padding: 40px; font-family: -apple-system, sans-serif; }
+  h1 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .label { font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; }
+  .surfaces { display: flex; gap: 40px; flex-wrap: wrap; }
+  .surface-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+
+  /* 8.5x14 letter: NO bleed. 1/16" clear space */
+  /* 8.5" = 816px, 14" = 1344px */
+  .surface {
+    width: 816px;
+    height: 1344px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #ccc;
+  }
+
+  .clear-space {
+    position: absolute;
+    inset: 0;
+    border: 6px solid rgba(255, 180, 180, 0.4);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .clear-label {
+    position: absolute;
+    top: 1px;
+    left: 8px;
+    font-size: 8px;
+    color: #cc6666;
+    z-index: 15;
+  }
+
+  .page-boundary {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    border: 1.5px solid #333;
+    pointer-events: none;
+    z-index: 11;
+  }
+  .page-label {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 8px;
+    color: #333;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+  }
+
+  /* Address block same as standard */
+  .address-block {
+    position: absolute;
+    width: 302.4px;
+    height: 192px;
+    left: 57.6px;
+    top: 80.64px;
+    background: rgba(220, 50, 50, 0.2);
+    border: 1.5px solid #cc3333;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .address-label {
+    font-size: 10px;
+    color: #cc3333;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .address-sublabel {
+    font-size: 8px;
+    color: #cc3333;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  /* Envelope window zones - visible through #10 double-window envelope */
+  /* Top window (return address): 3.25"W x 0.875"H at 0.63" from left, 0.5" from top */
+  /* 312px x 84px at left: 60.48px, top: 48px */
+  .envelope-window-top {
+    position: absolute;
+    width: 312px;
+    height: 84px;
+    left: 60.48px;
+    top: 48px;
+    background: rgba(50, 100, 220, 0.1);
+    border: 1.5px dashed #3366cc;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .envelope-window-label {
+    font-size: 9px;
+    color: #3366cc;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Bottom window (recipient address): 4"W x 1"H at 0.63" from left, 1.71" from top */
+  /* 384px x 96px at left: 60.48px, top: 164.16px */
+  .envelope-window-bottom {
+    position: absolute;
+    width: 384px;
+    height: 96px;
+    left: 60.48px;
+    top: 164.16px;
+    background: rgba(50, 100, 220, 0.1);
+    border: 1.5px dashed #3366cc;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* QR code zone: 0.5" x 0.5" at 0.087" from left and bottom edges */
+  /* 48px x 48px, left: 8.35px, bottom: 8.35px */
+  .qr-zone {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    left: 8.35px;
+    bottom: 8.35px;
+    background: rgba(150, 50, 200, 0.15);
+    border: 1.5px solid #9933cc;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-label {
+    font-size: 7px;
+    color: #9933cc;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .seq-id-zone {
+    position: absolute;
+    width: 139.2px;
+    height: 12px;
+    left: 28.8px;
+    bottom: 214.8px;
+    background: rgba(150, 50, 200, 0.1);
+    border: 1px solid rgba(153, 51, 204, 0.5);
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .seq-label {
+    font-size: 6px;
+    color: #9933cc;
+    text-align: center;
+  }
+
+  /* Fold lines for legal: double parallel fold */
+  /* Sections: 3.75" / 3.25" / 3.25" / 3.75" from top to bottom */
+  /* Fold 1 at 3.75" from top = 360px */
+  /* Fold 2 at 3.75" + 3.25" = 7" from top = 672px */
+  .fold-line-1 {
+    position: absolute;
+    top: 360px;
+    left: 0;
+    right: 0;
+    border-top: 2px dashed #ff6600;
+    z-index: 14;
+  }
+  .fold-line-2 {
+    position: absolute;
+    top: 672px;
+    left: 0;
+    right: 0;
+    border-top: 2px dashed #ff6600;
+    z-index: 14;
+  }
+  .fold-label {
+    position: absolute;
+    right: 8px;
+    font-size: 8px;
+    color: #ff6600;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 4px;
+    z-index: 15;
+  }
+
+  /* Annotation text */
+  .annotation {
+    position: absolute;
+    font-size: 8px;
+    color: #666;
+    z-index: 16;
+    max-width: 300px;
+    line-height: 1.3;
+    background: rgba(255,255,255,0.85);
+    padding: 2px 4px;
+  }
+
+  .design-area-label {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: #bbb;
+    z-index: 5;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .dims {
+    font-size: 10px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .note {
+    font-size: 11px;
+    color: #666;
+    margin-top: 8px;
+    max-width: 816px;
+    line-height: 1.4;
+  }
+
+  .enterprise-badge {
+    display: inline-block;
+    background: #6B21A8;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .legend {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #555;
+  }
+  .legend-swatch {
+    width: 16px;
+    height: 12px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+  <h1>Letter 8.5x14" Legal — Base Scaffold <span class="enterprise-badge">ENTERPRISE</span></h1>
+  <h2>Page: 8.5" x 14" &nbsp;|&nbsp; No bleed &nbsp;|&nbsp; Double parallel fold into #10 envelope &nbsp;|&nbsp; Max 3 sheets &nbsp;|&nbsp; 4-day SLA</h2>
+
+  <div class="surfaces">
+    <div class="surface-wrapper">
+      <div class="label">PAGE 1 (address page)</div>
+      <div class="surface">
+        <div class="clear-space"></div>
+        <div class="clear-label">CLEAR SPACE (1/16")</div>
+        <div class="page-boundary"></div>
+        <div class="page-label">PAGE EDGE — 8.5" x 14"</div>
+        <div class="envelope-window-top">
+          <span class="envelope-window-label">RETURN ADDRESS WINDOW<br>3.25" x 0.875"</span>
+        </div>
+        <div class="envelope-window-bottom">
+          <span class="envelope-window-label">RECIPIENT ADDRESS WINDOW<br>4" x 1"</span>
+        </div>
+        <div class="address-block">
+          <span class="address-label">ADDRESS BLOCK<br>(printed by Lob)</span>
+          <span class="address-sublabel">3.15" x 2"</span>
+        </div>
+        <div class="fold-line-1"></div>
+        <div class="fold-label" style="top: 362px;">FOLD LINE 1 (3.75" from top)</div>
+        <div class="fold-line-2"></div>
+        <div class="fold-label" style="top: 674px;">FOLD LINE 2 (7" from top)</div>
+        <div class="qr-zone">
+          <span class="qr-label">QR<br>0.5"</span>
+        </div>
+        <div class="seq-id-zone">
+          <span class="seq-label">SEQUENCE ID</span>
+        </div>
+        <div class="design-area-label">
+          Legal Letter Content Area<br><span style="font-size: 12px;">Double parallel fold to fit #10 envelope</span>
+        </div>
+        <!-- Annotations -->
+        <div class="annotation" style="left: 380px; top: 48px;">The blue areas represent the area which will be visible through the #10 double window envelope.</div>
+        <div class="annotation" style="left: 68px; bottom: 68px;">There should be a white box printed below the barcode. The white box is .5in x .5in placed 0.087" from the left and bottom edges. The 2d barcode is 0.2" x 0.2", centered inside.</div>
+        <div class="annotation" style="left: 500px; top: 362px;">Double parallel fold: 3.75" / 3.25" / 3.25" / 3.75" sections</div>
+      </div>
+      <div class="dims">Folds at 3.75" and 7" from top &nbsp;|&nbsp; Double parallel fold: 3.75" / 3.25" / 3.25" / 3.75" sections</div>
+      <div class="note">NOTE: Legal letters fold twice to fit a standard #10 double-window envelope. Max 3 sheets. No edge-to-edge printing. Enterprise only with 4-day SLA.</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(255, 180, 180, 0.4);"></div>
+      Clear Space (1/16")
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 1.5px solid #333;"></div>
+      Page Edge
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 2px dashed #ff6600;"></div>
+      Fold Lines
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(50, 100, 220, 0.1); border: 1.5px dashed #3366cc;"></div>
+      Envelope Window (visible through #10 double-window)
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(220, 50, 50, 0.2); border: 1px solid #cc3333;"></div>
+      Address Block
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(150, 50, 200, 0.15); border: 1px solid #9933cc;"></div>
+      QR / Sequence ID
+    </div>
+  </div>
+</body>
+</html>

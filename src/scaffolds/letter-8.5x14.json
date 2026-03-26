@@ -1,0 +1,147 @@
+{
+  "slug": "letter-8.5x14",
+  "displayName": "Letter 8.5×14 (Legal)",
+  "format": "letter",
+  "size": "8.5x14",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "WS8RDic5GCof4sPPyRykax",
+    "htmlScaffold": "letter-8.5x14.html"
+  },
+  "dimensions": {
+    "trimWidth": 8.5,
+    "trimHeight": 14,
+    "fileWidth": 8.5,
+    "fileHeight": 14,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "clearSpace",
+    "clearSpace": 0.0625
+  },
+  "safeZone": null,
+  "envelope": {
+    "type": "#10",
+    "foldPattern": "double-parallel",
+    "foldDescription": "3.75\" / 3.25\" / 3.25\" / 3.75\" sections"
+  },
+  "foldLines": [
+    {
+      "id": "fold-1",
+      "orientation": "horizontal",
+      "position": { "fromTop": 3.75 },
+      "label": "Fold 1 — 3.75\" from top"
+    },
+    {
+      "id": "fold-2",
+      "orientation": "horizontal",
+      "position": { "fromTop": 7 },
+      "label": "Fold 2 — 7\" from top"
+    }
+  ],
+  "pages": {
+    "min": 1,
+    "max": 3
+  },
+  "surfaces": [
+    {
+      "id": "page1",
+      "label": "Page 1",
+      "zones": [
+        {
+          "id": "envelope-window-return",
+          "type": "reserved",
+          "label": "Envelope Window — Return Address",
+          "rule": "This area is visible through the top envelope window. Place your logo or return address here.",
+          "anchor": "top-left",
+          "position": { "fromLeft": 0.63, "fromTop": 0.5 },
+          "size": { "width": 3.25, "height": 0.875 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "envelope-window-recipient",
+          "type": "reserved",
+          "label": "Envelope Window — Recipient Address",
+          "rule": "This area is visible through the bottom envelope window. Overlaps with the address block printed by Lob.",
+          "anchor": "top-left",
+          "position": { "fromLeft": 0.63, "fromTop": 1.71 },
+          "size": { "width": 4, "height": 1 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "address-block",
+          "type": "forbidden",
+          "label": "Address Block",
+          "rule": "No design content allowed. Lob prints the recipient address here. This area must remain white.",
+          "anchor": "top-left",
+          "position": { "fromLeft": 0.6, "fromTop": 0.84 },
+          "size": { "width": 3.15, "height": 2 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "qr-code-zone",
+          "type": "forbidden",
+          "label": "QR Code Zone",
+          "rule": "Lob prints a white 0.5\" box with a QR code here for mail piece tracking. Do not design into this corner.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.087, "fromBottom": 0.087 },
+          "size": { "width": 0.5, "height": 0.5 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "sequence-id",
+          "type": "forbidden",
+          "label": "Sequence ID Zone",
+          "rule": "Lob prints a machine-readable sequence identifier here. Do not design into this area.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.3, "fromBottom": 2.2375 },
+          "size": { "width": 1.45, "height": 0.09 },
+          "relativeTo": "page"
+        }
+      ],
+      "llmPrompt": "You are designing PAGE 1 of a legal 8.5×14\" letter.\n\nCanvas: 8.5\" wide × 14\" tall. NO bleed — there is a 1/16\" (0.0625\") clear space border where no content can appear. Letters cannot have edge-to-edge color.\n\nFold pattern: This letter folds into a #10 envelope using a double parallel fold: 3.75\" / 3.25\" / 3.25\" / 3.75\" sections. Fold lines at 3.75\" and 7\" from top.\n\nZone restrictions on Page 1:\n- ADDRESS BLOCK: A 3.15\" × 2\" rectangle at 0.6\" from left, 0.84\" from top must be COMPLETELY WHITE. Lob prints the recipient address here.\n- ENVELOPE WINDOW (return): A 3.25\" × 0.875\" area at 0.63\" from left, 0.5\" from top is visible through the top envelope window.\n- ENVELOPE WINDOW (recipient): A 4\" × 1\" area at 0.63\" from left, 1.71\" from top is visible through the bottom envelope window.\n- QR CODE: A 0.5\" × 0.5\" white box at 0.087\" from the left and bottom edges.\n- SEQUENCE ID: A 1.45\" × 0.09\" strip at 0.3\" from left, 2.2375\" from bottom.\n\nDesign tips:\n- Be mindful of fold lines at 3.75\" and 7\" — avoid placing critical content directly on these lines.\n- The top-left quadrant is heavily reserved — design your main content in the right half and lower portion.\n- Max 3 sheets for legal letters.\n- Merge variables like {{name}} can be used anywhere outside reserved zones."
+    },
+    {
+      "id": "pageN",
+      "label": "Subsequent Pages (2+)",
+      "zones": [
+        {
+          "id": "qr-code-zone",
+          "type": "forbidden",
+          "label": "QR Code Zone",
+          "rule": "Lob prints a white 0.5\" box with a QR code here for mail piece tracking.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.087, "fromBottom": 0.087 },
+          "size": { "width": 0.5, "height": 0.5 },
+          "relativeTo": "page"
+        },
+        {
+          "id": "sequence-id",
+          "type": "forbidden",
+          "label": "Sequence ID Zone",
+          "rule": "Lob prints a machine-readable sequence identifier here.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0.3, "fromBottom": 2.2375 },
+          "size": { "width": 1.45, "height": 0.09 },
+          "relativeTo": "page"
+        }
+      ],
+      "llmPrompt": "You are designing a SUBSEQUENT PAGE (page 2+) of a legal 8.5×14\" letter.\n\nCanvas: 8.5\" wide × 14\" tall. NO bleed — 1/16\" clear space border. No edge-to-edge color.\n\nFold lines at 3.75\" and 7\" from top — avoid placing critical content directly on folds.\n\nZone restrictions:\n- QR CODE: 0.5\" × 0.5\" white box at 0.087\" from left and bottom edges.\n- SEQUENCE ID: 1.45\" × 0.09\" at 0.3\" from left, 2.2375\" from bottom.\n\nDesign tips:\n- Subsequent pages have much more usable space than page 1.\n- Be mindful of fold lines — content crossing folds may be hard to read.\n- Max 3 sheets for legal letters."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK",
+    "colorOptions": ["bw", "color"],
+    "sidedOptions": ["single", "double"]
+  },
+  "notes": [
+    "Enterprise only.",
+    "Max 3 sheets currently.",
+    "Double parallel fold: 3.75\" / 3.25\" / 3.25\" / 3.75\" to fit #10 envelope.",
+    "No edge-to-edge printing — 1/16\" clear space on all sides."
+  ]
+}

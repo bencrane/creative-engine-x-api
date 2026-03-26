@@ -1,0 +1,93 @@
+{
+  "slug": "booklet-8.375x5.375",
+  "displayName": "Booklet 8.375×5.375 (Digest)",
+  "format": "booklet",
+  "size": "8.375x5.375",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "RvO5pI8G5IykFL6pQQJNU1",
+    "htmlScaffold": "booklet-8.375x5.375.html"
+  },
+  "dimensions": {
+    "trimWidth": 8.375,
+    "trimHeight": 5.375,
+    "fileWidth": 8.375,
+    "fileHeight": 5.375,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "none",
+    "description": "No bleed specified for offset-printed booklets."
+  },
+  "safeZone": null,
+  "binding": {
+    "type": "saddle-stitch",
+    "spineEdge": "left",
+    "gutterKeepOut": 0.25,
+    "description": "Saddle-stitched (stapled at spine). Keep text 0.25\" from spine edge."
+  },
+  "pages": {
+    "min": 8,
+    "max": 32,
+    "increment": 4,
+    "validCounts": [8, 12, 16, 20, 24, 28, 32]
+  },
+  "surfaces": [
+    {
+      "id": "cover-front",
+      "label": "Front Cover",
+      "zones": [
+        {
+          "id": "spine-gutter",
+          "type": "caution",
+          "label": "Spine Gutter",
+          "rule": "Keep text and critical elements at least 0.25\" from the left (spine) edge. Content too close will be hidden in the binding.",
+          "anchor": "left",
+          "position": { "fromLeft": 0 },
+          "size": { "width": 0.25, "height": 5.375 },
+          "relativeTo": "page"
+        }
+      ],
+      "llmPrompt": "You are designing the FRONT COVER of an 8.375×5.375\" digest booklet.\n\nPage size: 8.375\" wide × 5.375\" tall.\nStock: 60# Gloss Text.\n\nThe spine is on the LEFT edge. Keep all text and critical content at least 0.25\" from the left edge (spine gutter) — content too close will be lost in the binding.\n\nThis booklet is NOT personalizable — no merge variables. It is offset printed (higher quality than digital).\n\nDesign tips:\n- The front cover is the first impression — use bold, high-quality imagery.\n- Images can extend to the spine but expect some loss in the binding fold.\n- Page count must be 8, 12, 16, 20, 24, 28, or 32 (increments of 4).\n- Design at 300 DPI minimum for offset printing quality."
+    },
+    {
+      "id": "interior",
+      "label": "Interior Pages",
+      "zones": [
+        {
+          "id": "spine-gutter",
+          "type": "caution",
+          "label": "Spine Gutter",
+          "rule": "Keep text at least 0.25\" from the spine (left) edge on right-hand pages, or right edge on left-hand pages.",
+          "anchor": "left",
+          "position": { "fromLeft": 0 },
+          "size": { "width": 0.25, "height": 5.375 },
+          "relativeTo": "page"
+        }
+      ],
+      "llmPrompt": "You are designing an INTERIOR PAGE of an 8.375×5.375\" digest booklet.\n\nPage size: 8.375\" wide × 5.375\" tall.\n\nThe spine gutter is on the binding edge (left for right-hand pages, right for left-hand pages). Keep text at least 0.25\" from the binding edge.\n\nThis booklet is NOT personalizable — no merge variables. Offset printed.\n\nDesign tips:\n- Design spreads with the gutter in mind — content crossing the center spread will have a gap at the spine.\n- Maintain consistent margins across all pages.\n- Total page count must be in increments of 4 (8, 12, 16, 20, 24, 28, or 32)."
+    },
+    {
+      "id": "cover-back",
+      "label": "Back Cover",
+      "zones": [],
+      "llmPrompt": "You are designing the BACK COVER of an 8.375×5.375\" digest booklet.\n\nPage size: 8.375\" wide × 5.375\" tall.\n\nThe back cover has no restricted zones — it is fully customizable.\n\nDesign tips:\n- The back cover is often used for contact information, a final CTA, or branding.\n- Not personalizable — no merge variables.\n- Design at 300 DPI minimum."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf", "png", "jpeg"],
+  "mergeVariables": false,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK",
+    "stock": "60# Gloss Text",
+    "printMethod": "offset"
+  },
+  "notes": [
+    "Enterprise only.",
+    "NOT personalizable (no merge variables) — offset printed.",
+    "A 9×6\" digitally printed version with personalization is coming.",
+    "Page count must be in increments of 4 (8-32).",
+    "Saddle-stitched — keep text 0.25\" from spine edge."
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "slug": "selfmailer-6x18-bifold",
+  "displayName": "Self-Mailer 6×18 Bifold",
+  "format": "selfmailer",
+  "size": "6x18",
+  "foldType": "bifold",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "lDuFGZUZiHzx3R7LPehW0O",
+    "htmlScaffold": "selfmailer-6x18-bifold.html"
+  },
+  "dimensions": {
+    "trimWidth": 18,
+    "trimHeight": 6,
+    "fileWidth": 18.25,
+    "fileHeight": 6.25,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "bleed",
+    "bleed": 0.125
+  },
+  "safeZone": {
+    "inset": 0.125,
+    "measuredFrom": "trim",
+    "safeWidth": 17.75,
+    "safeHeight": 5.75
+  },
+  "finishedSize": {
+    "width": 9,
+    "height": 6,
+    "unit": "inches"
+  },
+  "foldLines": [
+    {
+      "id": "center-fold",
+      "orientation": "vertical",
+      "position": { "fromLeft": 9 },
+      "label": "Center fold — 9\" from left (horizontal bifold)",
+      "relativeTo": "trim"
+    }
+  ],
+  "panels": [
+    { "id": "left", "label": "Left Panel", "width": 9, "height": 6, "fromLeft": 0 },
+    { "id": "right", "label": "Right Panel", "width": 9, "height": 6, "fromLeft": 9 }
+  ],
+  "surfaces": [
+    {
+      "id": "outside",
+      "label": "Outside",
+      "zones": [
+        {
+          "id": "ink-free-zone",
+          "type": "forbidden",
+          "label": "Ink-Free Zone (Address + Postage)",
+          "rule": "No ink allowed. Must be completely white/blank. Reserved for recipient address and postage indicia.",
+          "anchor": "custom",
+          "position": { "fromLeft": 4.85, "fromBottom": 0.25 },
+          "size": { "width": 4, "height": 2.375 },
+          "relativeTo": "trim",
+          "note": "Positioned 0.15\" from fold line toward left panel, 0.25\" from bottom edge"
+        }
+      ],
+      "llmPrompt": "You are designing the OUTSIDE of a 6×18\" bifold self-mailer.\n\nCanvas: 18.25\" wide × 6.25\" tall (includes 0.125\" bleed on all sides).\nTrim: 18\" × 6\" — everything outside this is cut off.\nSafe zone: 17.75\" × 5.75\" (0.125\" inset from trim) — ALL text, logos, and critical content must stay inside this boundary.\n\nThis piece folds horizontally at the 9\" center line, creating two 9\" × 6\" panels. Finished size is 6\" × 9\".\n\nZone restrictions:\n- INK-FREE ZONE: A 4\" × 2.375\" rectangle on the left panel, positioned 0.15\" from the center fold and 0.25\" from the bottom edge. Must be COMPLETELY WHITE — no ink, no background, no images. This is where the recipient address and postage are printed.\n\nDesign tips:\n- The left panel (with the ink-free zone) is the address side when folded. Design around the ink-free zone.\n- The right panel is fully customizable on the outside.\n- Extend background colors into the bleed to avoid white edges after trimming.\n- The outside is what the recipient sees before opening.\n- Submit artwork upright — the printer inverts the inside during production."
+    },
+    {
+      "id": "inside",
+      "label": "Inside",
+      "zones": [
+        {
+          "id": "glue-zone",
+          "type": "caution",
+          "label": "Glue Zone",
+          "rule": "Adhesive is applied here to seal the mailer. Artwork CAN be placed here but may be obscured or damaged when opened. Avoid critical content.",
+          "anchor": "right",
+          "position": { "fromRight": 0 },
+          "size": { "width": 0.375, "height": 6 },
+          "relativeTo": "trim"
+        }
+      ],
+      "llmPrompt": "You are designing the INSIDE of a 6×18\" bifold self-mailer.\n\nCanvas: 18.25\" wide × 6.25\" tall (includes 0.125\" bleed on all sides).\nTrim: 18\" × 6\".\nSafe zone: 17.75\" × 5.75\" (0.125\" inset from trim).\n\nThis piece folds at the 9\" center line. The inside is fully revealed when the recipient opens the mailer.\n\nZone restrictions:\n- GLUE ZONE: A ~0.375\" strip along the right edge where adhesive seals the mailer. You CAN place artwork here, but it may be damaged when the recipient opens the piece. Avoid placing critical text or CTAs in this strip.\n\nDesign tips:\n- The inside is your full canvas — both panels are fully customizable.\n- This is the \"reveal\" moment — use it for your main message, offer, or CTA.\n- Design the inside upright — the printer will invert it during production.\n- The fold line at 9\" will have a slight crease — avoid placing critical text directly on it.\n- Merge variables like {{name}} or {{offer}} can be used anywhere."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf", "png", "jpeg"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK"
+  },
+  "notes": [
+    "Enterprise only.",
+    "Folds to 6×9\" finished size.",
+    "Horizontal bifold — fold at center (9\" from left).",
+    "Submit inside artwork upright — printer inverts during production."
+  ]
+}

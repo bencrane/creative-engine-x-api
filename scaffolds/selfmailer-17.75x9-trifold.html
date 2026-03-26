@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Self-Mailer 17.75x9 Trifold - Base Scaffold</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e8e8; padding: 40px; font-family: -apple-system, sans-serif; }
+  h1 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .label { font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; }
+  .surfaces { display: flex; gap: 40px; flex-wrap: wrap; }
+  .surface-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+  .enterprise-badge { display: inline-block; background: #6B21A8; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+
+  /* 17.75x9 trifold with bleed: 18" x 9.25" */
+  /* Shown vertically: 888px wide x 1728px tall */
+  .surface {
+    width: 888px;
+    height: 1728px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .bleed-zone { position: absolute; inset: 0; border: 12px solid rgba(255, 180, 180, 0.5); pointer-events: none; z-index: 10; }
+  .bleed-label { position: absolute; top: 1px; left: 14px; font-size: 8px; color: #cc6666; z-index: 15; }
+  .trim-line { position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; border: 1.5px solid #333; pointer-events: none; z-index: 11; }
+  .trim-label { position: absolute; top: 14px; left: 14px; font-size: 8px; color: #333; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px; }
+  .safe-zone { position: absolute; top: 24px; left: 24px; right: 24px; bottom: 24px; border: 1.5px dashed #22aa22; pointer-events: none; z-index: 12; }
+
+  /* 3 panels: C-fold inward. Top ~6", Middle ~6", Bottom ~5.75" (0.25" offset) */
+  /* Fold 1 at ~6" from top: (6 + 0.125) * 96 = 588px */
+  /* Fold 2 (score at 12"): (12 + 0.125) * 96 = 1164px */
+  .fold-line-1 {
+    position: absolute;
+    left: 0; right: 0;
+    top: 588px;
+    border-top: 2px dashed #ff6600;
+    z-index: 14;
+  }
+  .fold-line-2 {
+    position: absolute;
+    left: 0; right: 0;
+    top: 1164px;
+    border-top: 2px dashed #ff6600;
+    z-index: 14;
+  }
+  .fold-label {
+    position: absolute;
+    right: 14px;
+    font-size: 9px;
+    color: #ff6600;
+    font-weight: 600;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 4px;
+  }
+
+  /* Glue zone: 9" x 0.5" at 12" score */
+  /* 888px x 48px at top: 1164px */
+  .glue-zone {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 1164px;
+    height: 48px;
+    background: rgba(255, 200, 0, 0.15);
+    border: 1.5px dashed #cc9900;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .glue-label {
+    font-size: 8px;
+    color: #cc9900;
+    font-weight: 700;
+  }
+
+  /* Ink-free on top panel: 4" x 2.375", 0.15" from fold, 0.25" from right */
+  .ink-free-zone {
+    position: absolute;
+    width: 384px;
+    height: 228px;
+    right: 26.4px;
+    top: 345.6px; /* positioned within top panel, near fold */
+    background: rgba(220, 50, 50, 0.25);
+    border: 1.5px solid #cc3333;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .ink-free-label { font-size: 10px; color: #cc3333; font-weight: 700; text-align: center; line-height: 1.4; }
+  .ink-free-sublabel { font-size: 8px; color: #cc3333; text-align: center; margin-top: 2px; }
+
+  .panel-label {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: #bbb;
+    z-index: 5;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .dims { font-size: 10px; color: #888; margin-top: 4px; }
+  .legend { margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+  .legend-swatch { width: 16px; height: 12px; border-radius: 2px; }
+</style>
+</head>
+<body>
+  <h1>Self-Mailer 17.75x9" Trifold — Base Scaffold <span class="enterprise-badge">ENTERPRISE</span></h1>
+  <h2>Unfolded: 17.75" x 9" &nbsp;|&nbsp; C-fold to 6" x 9" &nbsp;|&nbsp; 3 panels, 0.25" offset on bottom &nbsp;|&nbsp; File with bleed: 18" x 9.25"</h2>
+
+  <div class="surfaces">
+    <div class="surface-wrapper">
+      <div class="label">OUTSIDE (address on top panel)</div>
+      <div class="surface">
+        <div class="bleed-zone"></div>
+        <div class="bleed-label">BLEED (0.125")</div>
+        <div class="trim-line"></div>
+        <div class="trim-label">TRIM — 17.75" x 9" (shown vertically)</div>
+        <div class="safe-zone"></div>
+        <div class="fold-line-1"></div>
+        <div class="fold-label" style="top: 590px;">FOLD 1</div>
+        <div class="fold-line-2"></div>
+        <div class="fold-label" style="top: 1166px;">FOLD 2 (score at 12")</div>
+        <div class="glue-zone"><span class="glue-label">GLUE ZONE — 9" x 0.5"</span></div>
+        <div class="ink-free-zone">
+          <span class="ink-free-label">INK-FREE ZONE<br>Address + Postage</span>
+          <span class="ink-free-sublabel">4" x 2.375"</span>
+        </div>
+        <div class="panel-label" style="top: 200px;">TOP PANEL — ~6"<br>(address side)</div>
+        <div class="panel-label" style="top: 850px;">MIDDLE PANEL — ~6"</div>
+        <div class="panel-label" style="top: 1400px;">BOTTOM PANEL — ~5.75"<br>(0.25" offset)</div>
+      </div>
+      <div class="dims">C-fold inward &nbsp;|&nbsp; Glue zone 9" x 0.5" at 12" score &nbsp;|&nbsp; Bottom panel 0.25" shorter</div>
+    </div>
+
+    <div class="surface-wrapper">
+      <div class="label">INSIDE (fully customizable)</div>
+      <div class="surface">
+        <div class="bleed-zone"></div>
+        <div class="bleed-label">BLEED (0.125")</div>
+        <div class="trim-line"></div>
+        <div class="trim-label">TRIM — 17.75" x 9"</div>
+        <div class="safe-zone"></div>
+        <div class="fold-line-1"></div>
+        <div class="fold-label" style="top: 590px;">FOLD 1</div>
+        <div class="fold-line-2"></div>
+        <div class="fold-label" style="top: 1166px;">FOLD 2</div>
+        <div class="panel-label" style="top: 200px;">TOP PANEL (inside)</div>
+        <div class="panel-label" style="top: 850px;">MIDDLE PANEL (inside)</div>
+        <div class="panel-label" style="top: 1400px;">BOTTOM PANEL (inside)</div>
+      </div>
+      <div class="dims">Submit artwork upright — printers invert inside during production</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background: rgba(255, 180, 180, 0.5);"></div>Bleed</div>
+    <div class="legend-item"><div class="legend-swatch" style="border: 1.5px solid #333;"></div>Trim</div>
+    <div class="legend-item"><div class="legend-swatch" style="border: 1.5px dashed #22aa22;"></div>Safe Zone</div>
+    <div class="legend-item"><div class="legend-swatch" style="border: 2px dashed #ff6600;"></div>Fold Lines</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: rgba(255,200,0,0.15); border: 1.5px dashed #cc9900;"></div>Glue Zone</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: rgba(220, 50, 50, 0.25); border: 1px solid #cc3333;"></div>Ink-Free Zone</div>
+  </div>
+</body>
+</html>

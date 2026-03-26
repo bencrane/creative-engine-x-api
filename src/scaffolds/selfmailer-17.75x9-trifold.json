@@ -1,0 +1,112 @@
+{
+  "slug": "selfmailer-17.75x9-trifold",
+  "displayName": "Self-Mailer 17.75×9 Trifold",
+  "format": "selfmailer",
+  "size": "17.75x9",
+  "foldType": "trifold",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "lDuFGZUZiHzx3R7LPehW0O",
+    "htmlScaffold": "selfmailer-17.75x9-trifold.html"
+  },
+  "dimensions": {
+    "trimWidth": 9,
+    "trimHeight": 17.75,
+    "fileWidth": 9.25,
+    "fileHeight": 18,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "bleed",
+    "bleed": 0.125
+  },
+  "safeZone": {
+    "inset": 0.125,
+    "measuredFrom": "trim",
+    "safeWidth": 8.75,
+    "safeHeight": 17.5
+  },
+  "finishedSize": {
+    "width": 9,
+    "height": 6,
+    "unit": "inches"
+  },
+  "foldLines": [
+    {
+      "id": "fold-1",
+      "orientation": "horizontal",
+      "position": { "fromTop": 6 },
+      "label": "Fold 1 — 6\" from top",
+      "relativeTo": "trim"
+    },
+    {
+      "id": "fold-2-score",
+      "orientation": "horizontal",
+      "position": { "fromTop": 12 },
+      "label": "Fold 2 (score line) — 12\" from top",
+      "relativeTo": "trim"
+    }
+  ],
+  "panels": [
+    { "id": "top", "label": "Top Panel", "width": 9, "height": 6, "fromTop": 0 },
+    { "id": "middle", "label": "Middle Panel", "width": 9, "height": 6, "fromTop": 6 },
+    { "id": "bottom", "label": "Bottom Panel (0.25\" offset)", "width": 9, "height": 5.75, "fromTop": 12 }
+  ],
+  "panelOffset": {
+    "description": "Bottom panel is 0.25\" shorter (5.75\") so it tucks inside the C-fold cleanly",
+    "topPanel": 6,
+    "middlePanel": 6,
+    "bottomPanel": 5.75
+  },
+  "surfaces": [
+    {
+      "id": "outside",
+      "label": "Outside",
+      "zones": [
+        {
+          "id": "ink-free-zone",
+          "type": "forbidden",
+          "label": "Ink-Free Zone (Address + Postage)",
+          "rule": "No ink allowed. Must be completely white/blank. Reserved for recipient address and postage indicia.",
+          "anchor": "custom",
+          "position": { "fromRight": 0.275, "fromTop": 3.475 },
+          "size": { "width": 4, "height": 2.375 },
+          "relativeTo": "trim",
+          "note": "Top panel, 0.15\" from fold 1 and 0.275\" from right edge"
+        }
+      ],
+      "llmPrompt": "You are designing the OUTSIDE of a 17.75×9\" trifold (C-fold) self-mailer.\n\nCanvas: 9.25\" wide × 18\" tall (includes 0.125\" bleed on all sides).\nTrim: 9\" × 17.75\" — everything outside this is cut off.\nSafe zone: 8.75\" × 17.5\" (0.125\" inset from trim).\n\nThis piece has THREE panels with a C-fold:\n- Top panel: 6\" (address panel when folded)\n- Middle panel: 6\"\n- Bottom panel: 5.75\" (0.25\" shorter to tuck inside fold)\n\nFold lines at 6\" and 12\" from top. Finished size is 6\" × 9\".\n\nZone restrictions:\n- INK-FREE ZONE: A 4\" × 2.375\" rectangle on the top panel, positioned 0.275\" from right edge and 0.15\" above fold 1 (6\" mark). Must be COMPLETELY WHITE.\n\nDesign tips:\n- Top panel = address side when folded. Design around the ink-free zone.\n- Middle and bottom panels are fully customizable on the outside.\n- The bottom panel tucks inside during the C-fold — the outside of this panel is partially hidden.\n- Extend backgrounds into bleed. Submit inside artwork upright."
+    },
+    {
+      "id": "inside",
+      "label": "Inside",
+      "zones": [
+        {
+          "id": "glue-zone",
+          "type": "caution",
+          "label": "Glue Zone (at score line)",
+          "rule": "9\" wide × 0.5\" tall adhesive strip at the 12\" score line. Artwork CAN be placed here but may be obscured. Avoid critical content.",
+          "anchor": "custom",
+          "position": { "fromTop": 12 },
+          "size": { "width": 9, "height": 0.5 },
+          "relativeTo": "trim"
+        }
+      ],
+      "llmPrompt": "You are designing the INSIDE of a 17.75×9\" trifold (C-fold) self-mailer.\n\nCanvas: 9.25\" wide × 18\" tall (includes 0.125\" bleed on all sides).\nTrim: 9\" × 17.75\".\nSafe zone: 8.75\" × 17.5\" (0.125\" inset from trim).\n\nThree panels: top (6\"), middle (6\"), bottom (5.75\"). Folds at 6\" and 12\" from top.\n\nZone restrictions:\n- GLUE ZONE: A 9\" × 0.5\" strip at the 12\" score line (fold 2). Adhesive is applied here. You CAN place artwork but it may be obscured or damaged when opened.\n\nDesign tips:\n- The inside is the \"big reveal\" — all three panels open up to display your full message.\n- The top panel inside is seen first when opening from the top.\n- The bottom panel tucks in — its inside is the last thing revealed during the C-fold opening.\n- Avoid critical content directly on fold lines (6\" and 12\").\n- Design upright — printer inverts during production.\n- Merge variables can be used anywhere."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf", "png", "jpeg"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK"
+  },
+  "notes": [
+    "Enterprise only.",
+    "C-fold (trifold) — folds to 6×9\" finished size.",
+    "Bottom panel is 0.25\" shorter (5.75\") to tuck cleanly inside fold.",
+    "Glue zone at 12\" score line seals the piece.",
+    "Submit inside artwork upright — printer inverts during production."
+  ]
+}

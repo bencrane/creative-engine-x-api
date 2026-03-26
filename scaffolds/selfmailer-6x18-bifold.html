@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Self-Mailer 6x18 Bifold - Base Scaffold</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e8e8; padding: 40px; font-family: -apple-system, sans-serif; }
+  h1 { font-size: 18px; color: #333; margin-bottom: 8px; }
+  h2 { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .label { font-size: 13px; color: #333; margin-bottom: 6px; font-weight: 600; }
+  .surfaces { display: flex; gap: 40px; flex-wrap: wrap; }
+  .surface-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+  .enterprise-badge {
+    display: inline-block;
+    background: #6B21A8;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* 6x18 bifold with bleed: 6.25" x 18.25" */
+  /* 600px x 1752px — displayed horizontally */
+  .surface {
+    width: 1752px;
+    height: 600px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .bleed-zone {
+    position: absolute;
+    inset: 0;
+    border: 12px solid rgba(255, 180, 180, 0.5);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .bleed-label {
+    position: absolute;
+    top: 1px;
+    left: 14px;
+    font-size: 8px;
+    color: #cc6666;
+    z-index: 15;
+  }
+
+  .trim-line {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    border: 1.5px solid #333;
+    pointer-events: none;
+    z-index: 11;
+  }
+  .trim-label {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-size: 8px;
+    color: #333;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 3px;
+  }
+
+  .safe-zone {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    border: 1.5px dashed #22aa22;
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  /* Center fold line at 9" = 864px from left edge of file */
+  .fold-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 876px; /* 9.125" * 96 = center of 18.25" */
+    border-left: 2px dashed #ff6600;
+    z-index: 14;
+  }
+  .fold-label {
+    position: absolute;
+    top: 14px;
+    left: 878px;
+    font-size: 9px;
+    color: #ff6600;
+    font-weight: 600;
+    z-index: 15;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 4px;
+  }
+
+  /* Ink-free zone on OUTSIDE: left panel, 4" x 2.375" */
+  /* 0.15" from center fold, 0.25" from bottom */
+  /* On outside left panel: right edge at fold - 0.15" = 876 - 14.4 = 861.6 */
+  /* Left edge = 861.6 - 384 = 477.6 */
+  .ink-free-zone {
+    position: absolute;
+    width: 384px;
+    height: 228px;
+    left: 477.6px;
+    bottom: 24px;
+    background: rgba(220, 50, 50, 0.25);
+    border: 1.5px solid #cc3333;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .ink-free-label {
+    font-size: 10px;
+    color: #cc3333;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .ink-free-sublabel {
+    font-size: 8px;
+    color: #cc3333;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .panel-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #bbb;
+    z-index: 5;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .dims {
+    font-size: 10px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .legend {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #555;
+  }
+  .legend-swatch {
+    width: 16px;
+    height: 12px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+  <h1>Self-Mailer 6x18" Bifold — Base Scaffold <span class="enterprise-badge">ENTERPRISE</span></h1>
+  <h2>Unfolded: 6" x 18" &nbsp;|&nbsp; Folds to 6" x 9" horizontally &nbsp;|&nbsp; No panel offset &nbsp;|&nbsp; File with bleed: 6.25" x 18.25"</h2>
+
+  <div class="surfaces">
+    <div class="surface-wrapper">
+      <div class="label">OUTSIDE (address side — left panel has ink-free zone)</div>
+      <div class="surface">
+        <div class="bleed-zone"></div>
+        <div class="bleed-label">BLEED (0.125")</div>
+        <div class="trim-line"></div>
+        <div class="trim-label">TRIM — 6" x 18"</div>
+        <div class="safe-zone"></div>
+        <div class="fold-line"></div>
+        <div class="fold-label">CENTER FOLD</div>
+        <div class="ink-free-zone">
+          <span class="ink-free-label">INK-FREE ZONE<br>Address + Postage</span>
+          <span class="ink-free-sublabel">4" x 2.375"</span>
+        </div>
+        <div style="position: absolute; left: 480px; bottom: 4px; font-size: 8px; color: #cc3333; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">The red area is an ink-free zone for address, postage, and barcode. Any content underneath will be covered.</div>
+        <!-- Explanatory labels -->
+        <div style="position: absolute; top: 1px; right: 14px; font-size: 8px; color: #cc6666; z-index: 15;">The bleed is extra space added to the file. The piece will still be trimmed to 6" x 18" before folding.</div>
+        <div style="position: absolute; top: 14px; left: 200px; font-size: 8px; color: #333; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">Your piece will be trimmed to this size and then folded to be 6" x 9".</div>
+        <div style="position: absolute; bottom: 26px; left: 26px; font-size: 8px; color: #22aa22; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">Text should be inside this area.</div>
+        <div style="position: absolute; top: 14px; left: 878px; font-size: 8px; color: #ff6600; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">Fold line — piece folds here</div>
+        <div class="panel-label" style="left: 200px;">LEFT PANEL<br>(address side)</div>
+        <div class="panel-label" style="left: 1100px;">RIGHT PANEL</div>
+      </div>
+      <div class="dims">Ink-free: 4" x 2.375" on left panel &nbsp;|&nbsp; 0.15" from fold, 0.25" from bottom</div>
+    </div>
+
+    <div class="surface-wrapper">
+      <div class="label">INSIDE (fully customizable — submit artwork upright)</div>
+      <div class="surface">
+        <div class="bleed-zone"></div>
+        <div class="bleed-label">BLEED (0.125")</div>
+        <div class="trim-line"></div>
+        <div class="trim-label">TRIM — 6" x 18"</div>
+        <div class="safe-zone"></div>
+        <div class="fold-line"></div>
+        <div class="fold-label">CENTER FOLD</div>
+        <!-- Glue Zone: right edge of inside surface -->
+        <div style="position: absolute; top: 12px; bottom: 12px; right: 12px; width: 36px; background: rgba(100, 200, 150, 0.2); border: 1.5px dashed #22aa88; z-index: 13; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 8px; color: #22aa88; font-weight: 600; writing-mode: vertical-lr; text-align: center;">GLUE ZONE</span>
+        </div>
+        <div style="position: absolute; top: 50px; right: 54px; font-size: 8px; color: #22aa88; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px; max-width: 140px; text-align: right;">Adhesive applied here during production. Content may be obscured.</div>
+        <!-- Explanatory labels -->
+        <div style="position: absolute; top: 1px; right: 60px; font-size: 8px; color: #cc6666; z-index: 15;">The bleed is extra space added to the file. The piece will still be trimmed to 6" x 18" before folding.</div>
+        <div style="position: absolute; top: 14px; left: 200px; font-size: 8px; color: #333; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">Your piece will be trimmed to this size and then folded to be 6" x 9".</div>
+        <div style="position: absolute; bottom: 26px; left: 26px; font-size: 8px; color: #22aa22; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">Text should be inside this area.</div>
+        <div style="position: absolute; top: 14px; left: 878px; font-size: 8px; color: #ff6600; z-index: 15; background: rgba(255,255,255,0.8); padding: 1px 3px;">Fold line — piece folds here</div>
+        <div class="panel-label" style="left: 200px;">LEFT PANEL<br>(inside)</div>
+        <div class="panel-label" style="left: 1100px;">RIGHT PANEL<br>(inside)</div>
+      </div>
+      <div class="dims">Inside panels: fully customizable &nbsp;|&nbsp; Glue zone on right edge &nbsp;|&nbsp; Printers will invert inside panel during production</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(255, 180, 180, 0.5);"></div>
+      Bleed (0.125")
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 1.5px solid #333;"></div>
+      Trim Line
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 1.5px dashed #22aa22;"></div>
+      Safe Zone
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="border: 2px dashed #ff6600;"></div>
+      Fold Line
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(220, 50, 50, 0.25); border: 1px solid #cc3333;"></div>
+      Ink-Free Zone
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: rgba(100, 200, 150, 0.2); border: 1.5px dashed #22aa88;"></div>
+      Glue Zone
+    </div>
+  </div>
+</body>
+</html>

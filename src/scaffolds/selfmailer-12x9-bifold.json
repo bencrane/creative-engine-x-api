@@ -1,0 +1,97 @@
+{
+  "slug": "selfmailer-12x9-bifold",
+  "displayName": "Self-Mailer 12×9 Bifold",
+  "format": "selfmailer",
+  "size": "12x9",
+  "foldType": "bifold",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "lDuFGZUZiHzx3R7LPehW0O",
+    "htmlScaffold": "selfmailer-12x9-bifold.html"
+  },
+  "dimensions": {
+    "trimWidth": 9,
+    "trimHeight": 12,
+    "fileWidth": 9.25,
+    "fileHeight": 12.25,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "bleed",
+    "bleed": 0.125
+  },
+  "safeZone": {
+    "inset": 0.125,
+    "measuredFrom": "trim",
+    "safeWidth": 8.75,
+    "safeHeight": 11.75
+  },
+  "finishedSize": {
+    "width": 9,
+    "height": 6,
+    "unit": "inches"
+  },
+  "foldLines": [
+    {
+      "id": "center-fold",
+      "orientation": "horizontal",
+      "position": { "fromTop": 6 },
+      "label": "Center fold — 6\" from top (vertical bifold)",
+      "relativeTo": "trim"
+    }
+  ],
+  "panels": [
+    { "id": "top", "label": "Top Panel", "width": 9, "height": 6, "fromTop": 0 },
+    { "id": "bottom", "label": "Bottom Panel", "width": 9, "height": 6, "fromTop": 6 }
+  ],
+  "surfaces": [
+    {
+      "id": "outside",
+      "label": "Outside",
+      "zones": [
+        {
+          "id": "ink-free-zone",
+          "type": "forbidden",
+          "label": "Ink-Free Zone (Address + Postage)",
+          "rule": "No ink allowed. Must be completely white/blank. Reserved for recipient address and postage indicia.",
+          "anchor": "custom",
+          "position": { "fromRight": 0.275, "fromTop": 3.475 },
+          "size": { "width": 4, "height": 2.375 },
+          "relativeTo": "trim",
+          "note": "Top panel, positioned 0.15\" from fold line and 0.275\" from right edge"
+        }
+      ],
+      "llmPrompt": "You are designing the OUTSIDE of a 12×9\" bifold self-mailer.\n\nCanvas: 9.25\" wide × 12.25\" tall (includes 0.125\" bleed on all sides).\nTrim: 9\" × 12\" — everything outside this is cut off.\nSafe zone: 8.75\" × 11.75\" (0.125\" inset from trim) — ALL text, logos, and critical content must stay inside this boundary.\n\nThis piece folds vertically at the 6\" center line, creating two 9\" × 6\" panels (top and bottom). Finished size is 6\" × 9\".\n\nZone restrictions:\n- INK-FREE ZONE: A 4\" × 2.375\" rectangle on the top panel, positioned 0.275\" from the right edge and 0.15\" above the center fold. Must be COMPLETELY WHITE — no ink, no background, no images. This is where the recipient address and postage are printed.\n\nDesign tips:\n- The top panel (with the ink-free zone) is the address side when folded.\n- The bottom panel is fully customizable on the outside.\n- Extend background colors into the bleed to avoid white edges.\n- Submit inside artwork upright — the printer inverts it during production."
+    },
+    {
+      "id": "inside",
+      "label": "Inside",
+      "zones": [
+        {
+          "id": "glue-zone",
+          "type": "caution",
+          "label": "Glue Zone",
+          "rule": "Adhesive is applied here to seal the mailer. Artwork CAN be placed here but may be obscured or damaged when opened. Avoid critical content.",
+          "anchor": "top",
+          "position": { "fromTop": 0 },
+          "size": { "width": 9, "height": 0.375 },
+          "relativeTo": "trim"
+        }
+      ],
+      "llmPrompt": "You are designing the INSIDE of a 12×9\" bifold self-mailer.\n\nCanvas: 9.25\" wide × 12.25\" tall (includes 0.125\" bleed on all sides).\nTrim: 9\" × 12\".\nSafe zone: 8.75\" × 11.75\" (0.125\" inset from trim).\n\nThis piece folds at 6\" from top. The inside is fully revealed when the recipient opens the mailer.\n\nZone restrictions:\n- GLUE ZONE: A ~0.375\" strip along the top edge where adhesive seals the mailer. You CAN place artwork here, but it may be damaged when opened. Avoid critical text or CTAs.\n\nDesign tips:\n- Both panels of the inside are fully customizable.\n- This is the \"reveal\" moment — use it for your main message, offer, or CTA.\n- Design upright — the printer inverts during production.\n- The fold at 6\" creates a slight crease — avoid critical text directly on it.\n- Merge variables like {{name}} can be used anywhere."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf", "png", "jpeg"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK"
+  },
+  "notes": [
+    "Enterprise only.",
+    "Folds to 6×9\" finished size.",
+    "Vertical bifold — fold at center (6\" from top).",
+    "Submit inside artwork upright — printer inverts during production."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "slug": "postcard-6x11",
+  "displayName": "Postcard 6×11",
+  "format": "postcard",
+  "size": "6x11",
+  "plan": "any",
+  "figma": {
+    "fileKey": "SMoEklS7SoNgukwFUMw6SU",
+    "htmlScaffold": "postcard-6x11.html"
+  },
+  "dimensions": {
+    "trimWidth": 11,
+    "trimHeight": 6,
+    "fileWidth": 11.25,
+    "fileHeight": 6.25,
+    "unit": "inches"
+  },
+  "bleedModel": {
+    "type": "bleed",
+    "bleed": 0.125
+  },
+  "safeZone": {
+    "inset": 0.0625,
+    "measuredFrom": "trim",
+    "safeWidth": 10.875,
+    "safeHeight": 5.875
+  },
+  "surfaces": [
+    {
+      "id": "front",
+      "label": "Front",
+      "zones": [
+        {
+          "id": "usps-scan-warning",
+          "type": "warning",
+          "label": "USPS Scan Warning Zone",
+          "rule": "Avoid address-like text (street names, city/state, zip codes). Images, logos, and marketing copy are fine.",
+          "anchor": "bottom-left",
+          "position": { "fromLeft": 0, "fromBottom": 0 },
+          "size": { "width": 11, "height": 2.375 },
+          "relativeTo": "trim"
+        }
+      ],
+      "llmPrompt": "You are designing the FRONT of a 6×11 postcard.\n\nCanvas: 11.25\" wide × 6.25\" tall (includes 0.125\" bleed on all sides).\nTrim: 11\" × 6\" — everything outside this is cut off.\nSafe zone: 10.875\" × 5.875\" (0.0625\" inset from trim) — ALL text, logos, and critical content must stay inside this boundary.\n\nZone restrictions:\n- USPS SCAN WARNING: The bottom 2.375\" of the front (measured from trim) is scanned by USPS sorting machines. Do NOT place any text that resembles a mailing address (street names, city/state, zip codes) in this area. Images, logos, and marketing copy are fine.\n\nDesign tips:\n- Extend background colors and images into the bleed area to avoid white edges after trimming.\n- This is the largest postcard size — maximum visual impact.\n- This is the attention-grabbing side — use bold imagery and a clear headline."
+    },
+    {
+      "id": "back",
+      "label": "Back",
+      "zones": [
+        {
+          "id": "ink-free-zone",
+          "type": "forbidden",
+          "label": "Ink-Free Zone (Address + Postage)",
+          "rule": "No ink allowed. Must be completely white/blank. Reserved for recipient address and postage indicia.",
+          "anchor": "bottom-right",
+          "position": { "fromRight": 0.275, "fromBottom": 0.25 },
+          "size": { "width": 4, "height": 2.375 },
+          "relativeTo": "trim"
+        }
+      ],
+      "llmPrompt": "You are designing the BACK of a 6×11 postcard.\n\nCanvas: 11.25\" wide × 6.25\" tall (includes 0.125\" bleed on all sides).\nTrim: 11\" × 6\" — everything outside this is cut off.\nSafe zone: 10.875\" × 5.875\" (0.0625\" inset from trim) — ALL text, logos, and critical content must stay inside this boundary.\n\nZone restrictions:\n- INK-FREE ZONE: A 4\" × 2.375\" rectangle in the bottom-right corner (0.275\" from right trim edge, 0.25\" from bottom trim edge) must be COMPLETELY WHITE. No ink, no background color, no images. This is where the recipient address and postage are printed.\n\nDesign tips:\n- Design your content around the ink-free zone — the left side and top are fully available.\n- Extend background colors into the bleed, but leave the ink-free zone pure white.\n- This side typically carries the message, CTA, or offer details.\n- Merge variables like {{name}} or {{offer}} can be used anywhere outside the ink-free zone."
+    }
+  ],
+  "acceptedFormats": ["html", "pdf", "png", "jpeg"],
+  "mergeVariables": true,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK"
+  },
+  "notes": [
+    "Largest postcard size available.",
+    "Qualifies for USPS Marketing Mail letter rate.",
+    "Domestic only — cannot go international."
+  ]
+}

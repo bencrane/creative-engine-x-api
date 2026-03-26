@@ -1,0 +1,84 @@
+{
+  "slug": "card-affix",
+  "displayName": "Card Affix",
+  "format": "card-affix",
+  "size": "2.125x3.375",
+  "plan": "enterprise",
+  "figma": {
+    "fileKey": "813wa8IuLYf0kleraFSGju",
+    "htmlScaffold": "card-affix.html"
+  },
+  "orientations": [
+    {
+      "id": "vertical",
+      "label": "Vertical",
+      "dimensions": {
+        "trimWidth": 2.125,
+        "trimHeight": 3.375,
+        "fileWidth": 2.125,
+        "fileHeight": 3.375,
+        "unit": "inches"
+      },
+      "safeZone": {
+        "inset": 0.125,
+        "measuredFrom": "trim",
+        "safeWidth": 1.875,
+        "safeHeight": 3.125
+      }
+    },
+    {
+      "id": "horizontal",
+      "label": "Horizontal",
+      "dimensions": {
+        "trimWidth": 3.375,
+        "trimHeight": 2.125,
+        "fileWidth": 3.375,
+        "fileHeight": 2.125,
+        "unit": "inches"
+      },
+      "safeZone": {
+        "inset": 0.125,
+        "measuredFrom": "trim",
+        "safeWidth": 3.125,
+        "safeHeight": 1.875
+      }
+    }
+  ],
+  "bleedModel": {
+    "type": "none",
+    "description": "No bleed. Color prints edge-to-edge within trim. Cards have 1/8\" rounded corners."
+  },
+  "roundedCorners": {
+    "radius": 0.125,
+    "unit": "inches"
+  },
+  "surfaces": [
+    {
+      "id": "front",
+      "label": "Front",
+      "zones": [],
+      "llmPrompt": "You are designing the FRONT of a card affix.\n\nVertical orientation: 2.125\" wide × 3.375\" tall.\nHorizontal orientation: 3.375\" wide × 2.125\" tall.\n\nNo bleed — color can print edge-to-edge within the trim size. The card has 1/8\" (0.125\") rounded corners.\nSafe zone: 0.125\" inset from all edges — keep all text and critical content inside (vertical: 1.875\" × 3.125\", horizontal: 3.125\" × 1.875\").\n\nNo restricted zones — the front is fully customizable.\n\nDesign tips:\n- These are small physical cards affixed to 8.5×11\" letters.\n- PDF format only. No merge variables.\n- Min order: 10,000 cards.\n- Account for rounded corners — don't place content right at the corners.\n- Think of this like a business card, gift card, or membership card."
+    },
+    {
+      "id": "back",
+      "label": "Back",
+      "zones": [],
+      "llmPrompt": "You are designing the BACK of a card affix.\n\nVertical orientation: 2.125\" wide × 3.375\" tall.\nHorizontal orientation: 3.375\" wide × 2.125\" tall.\n\nNo bleed. 1/8\" rounded corners.\nSafe zone: 0.125\" inset from all edges.\n\nNo restricted zones — fully customizable.\n\nDesign tips:\n- The back is often used for terms, instructions, a barcode, or additional branding.\n- PDF format only. No merge variables.\n- Account for rounded corners."
+    }
+  ],
+  "acceptedFormats": ["pdf"],
+  "mergeVariables": false,
+  "printSpecs": {
+    "minDpi": 300,
+    "maxFileSize": "5MB",
+    "colorMode": "CMYK"
+  },
+  "notes": [
+    "Enterprise only.",
+    "Physical cards affixed to 8.5×11\" letters.",
+    "PDF format only (no HTML).",
+    "No merge variables.",
+    "Minimum order: 10,000 cards.",
+    "1/8\" rounded corners on all edges."
+  ]
+}
