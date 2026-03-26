@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.integrations.claude_client import ClaudeClient, GenerationResult, TokenUsage
+from src.integrations.claude_client import ClaudeClient, GenerationResult, TokenUsage, MODEL_QUALITY, MODEL_FAST
 
 
 def _make_mock_response(text="Hello", tool_use=None):
@@ -104,3 +104,16 @@ class TestGenerationResult:
         result = GenerationResult()
         assert result.content is None
         assert result.tool_results == []
+
+
+class TestModelTierConstants:
+    def test_model_quality_is_opus(self):
+        assert "opus" in MODEL_QUALITY
+
+    def test_model_fast_is_sonnet(self):
+        assert "sonnet" in MODEL_FAST
+
+    def test_generate_defaults_to_fast(self):
+        import inspect
+        sig = inspect.signature(ClaudeClient.generate)
+        assert sig.parameters["model"].default == MODEL_FAST
