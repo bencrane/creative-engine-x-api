@@ -9,6 +9,10 @@ from src.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Model tier constants
+MODEL_QUALITY = "claude-opus-4-20250514"    # Long-form content (PDFs, guides)
+MODEL_FAST = "claude-sonnet-4-20250514"      # Short-form structured output (ad copy)
+
 
 @dataclass
 class TokenUsage:
@@ -42,7 +46,7 @@ class ClaudeClient:
         self,
         messages: list[dict],
         system: str | list[dict] | None = None,
-        model: str = "claude-sonnet-4-20250514",
+        model: str = MODEL_FAST,
         temperature: float = 0.7,
         max_tokens: int = 4096,
         tools: list[dict] | None = None,

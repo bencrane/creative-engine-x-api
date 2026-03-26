@@ -2,9 +2,10 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from src.db import get_pool
 from src.routing.registry import registry
 from src.shared.models import ErrorDetail
 
@@ -147,3 +148,54 @@ async def generate_batch(body: BatchGenerateRequest, request: Request) -> Any:
 
 
     # Note: GET /jobs/{job_id} is now handled by src.jobs.router
+
+
+class ArtifactResponse(BaseModel):
+    id: str
+    artifact_type: str
+    surface: str
+    subtype: str | None = None
+    spec_id: str
+    status: str
+    content_url: str | None = None
+    content_json: dict | None = None
+    slug: str | None = None
+    template_used: str | None = None
+    created_at: datetime
+    updated_at: datetime | None = None
+
+
+@router.get("/artifacts/{artifact_id}", response_model=ArtifactResponse)
+async def get_artifact(artifact_id: str, request: Request) -> Any:
+    pool = await get_pool()
+    org_id = getattr(request.state, "organization_id", None)
+
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """SELECT id, artifact_type, surface, subtype, spec_id, status,
+                      content_url, content_json, slug, template_used,
+                      created_at, updated_at, organization_id
+               FROM generated_artifacts WHERE id = $1""",
+            artifact_id,
+        )
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    if org_id and row["organization_id"] != org_id:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+
+    return ArtifactResponse(
+        id=row["id"],
+        artifact_type=row["artifact_type"],
+        surface=row["surface"],
+        subtype=row["subtype"],
+        spec_id=row["spec_id"],
+        status=row["status"],
+        content_url=row["content_url"],
+        content_json=row["content_json"],
+        slug=row["slug"],
+        template_used=row["template_used"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+    )

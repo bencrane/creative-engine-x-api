@@ -1,3 +1,4 @@
+import hashlib
 import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -7,7 +8,7 @@ from jose import jwt
 
 from src.auth.middleware import AuthMiddleware, RateLimitMiddleware, PUBLIC_PREFIXES
 from src.auth.models import APIKeyRecord, Organization
-from src.auth.service import verify_api_key, verify_jwt, resolve_organization
+from src.auth.service import create_api_key, revoke_api_key, verify_api_key, verify_jwt, resolve_organization
 from src.shared.errors import AuthenticationError, RateLimitExceededError
 
 
@@ -46,7 +47,8 @@ class TestVerifyJWT:
 class TestVerifyAPIKey:
     async def test_valid_api_key(self):
         raw_key = "cex_live_test1234"
-        hashed = bcrypt.hashpw(raw_key.encode(), bcrypt.gensalt()).decode()
+        key_digest = hashlib.sha256(raw_key.encode()).hexdigest().encode()
+        hashed = bcrypt.hashpw(key_digest, bcrypt.gensalt()).decode()
         mock_row = {
             "id": "key-1",
             "organization_id": "org-1",
@@ -108,6 +110,88 @@ class TestResolveOrganization:
 
         with pytest.raises(AuthenticationError, match="Organization not found"):
             await resolve_organization("org-999", mock_pool)
+
+
+class TestCreateAPIKey:
+    async def test_creates_key_with_prefix(self):
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow = AsyncMock(
+            return_value={
+                "id": "key-new",
+                "organization_id": "org-1",
+                "key_hash": "hashed",
+                "key_prefix": "cex_live",
+                "name": "My Key",
+                "scopes": ["generate"],
+                "rate_limit_rpm": 100,
+                "is_active": True,
+                "last_used_at": None,
+                "created_at": None,
+                "expires_at": None,
+            }
+        )
+        mock_pool = MagicMock()
+        mock_pool.acquire.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+        mock_pool.acquire.return_value.__aexit__ = AsyncMock(return_value=False)
+
+        raw_key, record = await create_api_key(
+            org_id="org-1",
+            name="My Key",
+            scopes=["generate"],
+            rate_limit_rpm=100,
+            pool=mock_pool,
+        )
+        assert raw_key.startswith("cex_live_")
+        assert len(raw_key) == len("cex_live_") + 64  # 32 hex bytes = 64 chars
+        assert record.name == "My Key"
+        assert record.organization_id == "org-1"
+
+    async def test_key_is_unique_each_call(self):
+        mock_conn = AsyncMock()
+        mock_conn.fetchrow = AsyncMock(
+            return_value={
+                "id": "key-new",
+                "organization_id": "org-1",
+                "key_hash": "hashed",
+                "key_prefix": "cex_live",
+                "name": "test",
+                "scopes": [],
+                "rate_limit_rpm": 60,
+                "is_active": True,
+                "last_used_at": None,
+                "created_at": None,
+                "expires_at": None,
+            }
+        )
+        mock_pool = MagicMock()
+        mock_pool.acquire.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+        mock_pool.acquire.return_value.__aexit__ = AsyncMock(return_value=False)
+
+        key1, _ = await create_api_key("org-1", "test", [], 60, mock_pool)
+        key2, _ = await create_api_key("org-1", "test", [], 60, mock_pool)
+        assert key1 != key2
+
+
+class TestRevokeAPIKey:
+    async def test_revoke_sets_inactive(self):
+        mock_conn = AsyncMock()
+        mock_conn.execute = AsyncMock(return_value="UPDATE 1")
+        mock_pool = MagicMock()
+        mock_pool.acquire.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+        mock_pool.acquire.return_value.__aexit__ = AsyncMock(return_value=False)
+
+        await revoke_api_key("key-1", mock_pool)
+        mock_conn.execute.assert_called_once()
+
+    async def test_revoke_nonexistent_raises(self):
+        mock_conn = AsyncMock()
+        mock_conn.execute = AsyncMock(return_value="UPDATE 0")
+        mock_pool = MagicMock()
+        mock_pool.acquire.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+        mock_pool.acquire.return_value.__aexit__ = AsyncMock(return_value=False)
+
+        with pytest.raises(AuthenticationError, match="API key not found"):
+            await revoke_api_key("nonexistent", mock_pool)
 
 
 # --- Middleware tests ---
