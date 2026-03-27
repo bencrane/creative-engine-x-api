@@ -177,6 +177,7 @@ class BaseGenerator(ABC):
         brand_context: BrandContext,
         spec: FormatSpec,
         claude_client: ClaudeClient,
+        output_schema_override: type[BaseModel] | None = None,
     ) -> GeneratedContent:
         """Full generation pipeline: build prompts → call Claude → validate → return."""
         system_prompt = self.build_system_prompt(brand_context, spec)
@@ -187,10 +188,13 @@ class BaseGenerator(ABC):
         temperature = self._resolve_temperature(spec)
 
         # Build tool schema from output_schema if available
+        # output_schema_override allows subclasses to pass a per-request schema
+        # without mutating self.output_schema (which is unsafe under concurrency)
+        effective_schema = output_schema_override or self.output_schema
         tools = None
         tool_choice = None
-        if self.output_schema is not None:
-            schema = self.output_schema.model_json_schema()
+        if effective_schema is not None:
+            schema = effective_schema.model_json_schema()
             tool_name = f"generate_{self.generator_type}"
             tools = [
                 {

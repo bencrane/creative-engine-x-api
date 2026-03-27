@@ -241,9 +241,7 @@ class LandingPageGenerator(BaseGenerator):
                 f"Valid: {sorted(VALID_TEMPLATE_TYPES)}"
             )
 
-        original_schema = self.output_schema
-        self.output_schema = _OUTPUT_SCHEMAS[template_type]
-        try:
-            return await super().generate(content_props, brand_context, spec, claude_client)
-        finally:
-            self.output_schema = original_schema
+        return await super().generate(
+            content_props, brand_context, spec, claude_client,
+            output_schema_override=_OUTPUT_SCHEMAS[template_type],
+        )

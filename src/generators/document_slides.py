@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from src.brand.models import BrandContext
 from src.generators.base import BaseGenerator, GeneratedContent
 from src.integrations.claude_client import ClaudeClient, MODEL_QUALITY
+from src.shared.text import truncate_at_word_boundary
 from src.specs.models import FormatSpec
 
 logger = logging.getLogger(__name__)
@@ -144,12 +145,12 @@ class DocumentSlidesGenerator(BaseGenerator):
         for i, slide in enumerate(slides):
             headline = slide.get("headline", "")
             if len(headline) > 50:
-                slide["headline"] = headline[:50]
+                slide["headline"] = truncate_at_word_boundary(headline, 50)
                 warnings.append(f"slide {i} headline truncated to 50 chars")
 
             body = slide.get("body")
             if body and len(body) > 120:
-                slide["body"] = body[:120]
+                slide["body"] = truncate_at_word_boundary(body, 120)
                 warnings.append(f"slide {i} body truncated to 120 chars")
 
         # Ensure last slide is CTA

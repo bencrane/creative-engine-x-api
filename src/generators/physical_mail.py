@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from src.brand.models import BrandContext
 from src.generators.base import BaseGenerator, GeneratedContent
 from src.integrations.claude_client import ClaudeClient, MODEL_FAST
+from src.shared.text import truncate_at_word_boundary
 from src.specs.models import FormatSpec
 
 logger = logging.getLogger(__name__)
@@ -160,13 +161,13 @@ class PhysicalMailGenerator(BaseGenerator):
             headline = postcard.get("headline", "")
             headline_max = config.get("headline_max", 50)
             if len(headline) > headline_max:
-                postcard["headline"] = headline[:headline_max]
+                postcard["headline"] = truncate_at_word_boundary(headline, headline_max)
                 warnings.append(f"headline truncated to {headline_max} chars")
 
             body = postcard.get("body_copy", "")
             body_max = config.get("body_max", 200)
             if len(body) > body_max:
-                postcard["body_copy"] = body[:body_max]
+                postcard["body_copy"] = truncate_at_word_boundary(body, body_max)
                 warnings.append(f"body_copy truncated to {body_max} chars")
 
         return content, warnings
