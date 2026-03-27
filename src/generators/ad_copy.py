@@ -71,15 +71,7 @@ VALID_PLATFORMS = {"linkedin", "meta", "google"}
 # Character limit validation
 # ---------------------------------------------------------------------------
 
-def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
-    """Truncate text at word boundary, respecting max_chars."""
-    if len(text) <= max_chars:
-        return text
-    truncated = text[:max_chars]
-    last_space = truncated.rfind(" ")
-    if last_space > 0:
-        truncated = truncated[:last_space]
-    return truncated
+from src.shared.text import truncate_at_word_boundary as _truncate_at_word_boundary
 
 
 def _get_char_limits(spec: FormatSpec) -> dict[str, int]:
@@ -298,10 +290,7 @@ class AdCopyGenerator(BaseGenerator):
                 f"Unknown ad platform '{platform}'. Valid: {sorted(VALID_PLATFORMS)}"
             )
 
-        # Override output schema per platform
-        original_schema = self.output_schema
-        self.output_schema = _OUTPUT_SCHEMAS[platform]
-        try:
-            return await super().generate(content_props, brand_context, spec, claude_client)
-        finally:
-            self.output_schema = original_schema
+        return await super().generate(
+            content_props, brand_context, spec, claude_client,
+            output_schema_override=_OUTPUT_SCHEMAS[platform],
+        )

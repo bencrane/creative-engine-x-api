@@ -2,10 +2,13 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from pydantic import BaseModel
 
+from src.brand.models import BrandContext
+from src.brand.service import build_brand_context
 from src.db import get_pool
+from src.pipeline.orchestrator import run_sync_pipeline, run_async_pipeline, execute_async_job
 from src.routing.registry import registry
 from src.shared.models import ErrorDetail
 
@@ -85,41 +88,77 @@ ASYNC_ARTIFACT_TYPES = {"video", "audio"}
 
 
 @router.post("/generate", response_model=GenerateResponse | AsyncGenerateResponse)
-async def generate(body: GenerateRequest, request: Request) -> Any:
+async def generate(
+    body: GenerateRequest, request: Request, background_tasks: BackgroundTasks
+) -> Any:
     spec = registry.resolve(body.artifact_type, body.surface)
+
+    # Resolve brand context: inline takes precedence, then by-reference, then empty
+    org_id = getattr(request.state, "organization_id", None) or "anonymous"
+    if body.brand_context:
+        brand_context = BrandContext(**body.brand_context)
+    elif body.brand_context_id:
+        pool = await get_pool()
+        brand_context = await build_brand_context(body.brand_context_id, pool)
+    else:
+        brand_context = BrandContext()
 
     is_async = (
         spec.delivery and spec.delivery.mode == "async"
     ) or body.artifact_type in ASYNC_ARTIFACT_TYPES
 
     if is_async:
-        job_id = str(uuid.uuid4())
-        return AsyncGenerateResponse(
-            job_id=job_id,
+        result = await run_async_pipeline(
+            spec=spec,
+            content_props=body.content_props,
+            brand_context=brand_context,
+            org_id=org_id,
+            subtype=body.subtype,
+            webhook_url=body.webhook_url,
+            callback_metadata=body.callback_metadata,
+        )
+        # Kick off the actual work in the background
+        background_tasks.add_task(execute_async_job, result["job_id"])
+        return AsyncGenerateResponse(**result)
+
+    # Sync pipeline — generate, render, store, return
+    try:
+        result = await run_sync_pipeline(
+            spec=spec,
+            content_props=body.content_props,
+            brand_context=brand_context,
+            org_id=org_id,
+            subtype=body.subtype,
+        )
+        return GenerateResponse(
+            artifact_id=result["artifact_id"],
+            artifact_type=result["artifact_type"],
+            surface=result["surface"],
+            status=result["status"],
+            content_url=result.get("content_url"),
+            content=result.get("content"),
+            content_preview=result.get("content_preview"),
+            spec_id=result["spec_id"],
+            created_at=result["created_at"],
+        )
+    except Exception as e:
+        artifact_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc)
+        return GenerateResponse(
+            artifact_id=artifact_id,
             artifact_type=body.artifact_type,
             surface=body.surface,
-            status="queued",
-            poll_url=f"/jobs/{job_id}",
-            webhook_url=body.webhook_url,
+            status="failed",
+            spec_id=spec.spec_id,
+            created_at=now,
+            error=ErrorDetail(code="generation_error", message=str(e)),
         )
-
-    # Sync placeholder response (actual generation is Phase 2)
-    artifact_id = str(uuid.uuid4())
-    now = datetime.now(timezone.utc)
-    return GenerateResponse(
-        artifact_id=artifact_id,
-        artifact_type=body.artifact_type,
-        surface=body.surface,
-        status="completed",
-        content={"placeholder": True, "spec_id": spec.spec_id},
-        content_preview="Placeholder response — generation not yet implemented",
-        spec_id=spec.spec_id,
-        created_at=now,
-    )
 
 
 @router.post("/generate/batch", response_model=BatchGenerateResponse)
-async def generate_batch(body: BatchGenerateRequest, request: Request) -> Any:
+async def generate_batch(
+    body: BatchGenerateRequest, request: Request, background_tasks: BackgroundTasks
+) -> Any:
     results: list[GenerateResponse | AsyncGenerateResponse] = []
     errors: list[BatchItemError] = []
 
@@ -131,7 +170,7 @@ async def generate_batch(body: BatchGenerateRequest, request: Request) -> Any:
             if item.brand_context is None and body.brand_context:
                 item.brand_context = body.brand_context
 
-            result = await generate(item, request)
+            result = await generate(item, request, background_tasks)
             results.append(result)
         except Exception as e:
             errors.append(
@@ -145,9 +184,6 @@ async def generate_batch(body: BatchGenerateRequest, request: Request) -> Any:
         results=results,
         errors=errors if errors else None,
     )
-
-
-    # Note: GET /jobs/{job_id} is now handled by src.jobs.router
 
 
 class ArtifactResponse(BaseModel):

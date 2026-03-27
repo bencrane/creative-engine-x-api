@@ -48,7 +48,20 @@ class TestRouteRegistry:
 
 
 class TestGenerateEndpoint:
-    def test_sync_generate_returns_completed(self, client):
+    @patch("src.routing.router.run_sync_pipeline")
+    def test_sync_generate_returns_completed(self, mock_pipeline, client):
+        now = datetime.now(timezone.utc)
+        mock_pipeline.return_value = {
+            "artifact_id": "art-123",
+            "artifact_type": "structured_text",
+            "surface": "linkedin",
+            "status": "completed",
+            "content_url": None,
+            "content": {"headline": "Test"},
+            "content_preview": '{"headline": "Test"}',
+            "spec_id": "structured_text__linkedin",
+            "created_at": now,
+        }
         response = client.post(
             "/generate",
             json={
@@ -63,8 +76,19 @@ class TestGenerateEndpoint:
         assert data["artifact_type"] == "structured_text"
         assert data["spec_id"] == "structured_text__linkedin"
         assert "artifact_id" in data
+        mock_pipeline.assert_called_once()
 
-    def test_async_generate_returns_queued(self, client):
+    @patch("src.routing.router.execute_async_job")
+    @patch("src.routing.router.run_async_pipeline")
+    def test_async_generate_returns_queued(self, mock_async_pipeline, mock_execute, client):
+        mock_async_pipeline.return_value = {
+            "job_id": "job-456",
+            "artifact_type": "video",
+            "surface": "generic",
+            "status": "queued",
+            "poll_url": "/jobs/job-456",
+            "webhook_url": None,
+        }
         response = client.post(
             "/generate",
             json={
@@ -94,7 +118,20 @@ class TestGenerateEndpoint:
 
 
 class TestBatchEndpoint:
-    def test_batch_generate(self, client):
+    @patch("src.routing.router.run_sync_pipeline")
+    def test_batch_generate(self, mock_pipeline, client):
+        now = datetime.now(timezone.utc)
+        mock_pipeline.return_value = {
+            "artifact_id": "art-batch",
+            "artifact_type": "structured_text",
+            "surface": "linkedin",
+            "status": "completed",
+            "content_url": None,
+            "content": {"headline": "Test"},
+            "content_preview": "test",
+            "spec_id": "structured_text__linkedin",
+            "created_at": now,
+        }
         response = client.post(
             "/generate/batch",
             json={
@@ -116,7 +153,20 @@ class TestBatchEndpoint:
         data = response.json()
         assert len(data["results"]) == 2
 
-    def test_batch_with_errors(self, client):
+    @patch("src.routing.router.run_sync_pipeline")
+    def test_batch_with_errors(self, mock_pipeline, client):
+        now = datetime.now(timezone.utc)
+        mock_pipeline.return_value = {
+            "artifact_id": "art-batch",
+            "artifact_type": "structured_text",
+            "surface": "linkedin",
+            "status": "completed",
+            "content_url": None,
+            "content": {},
+            "content_preview": "test",
+            "spec_id": "structured_text__linkedin",
+            "created_at": now,
+        }
         response = client.post(
             "/generate/batch",
             json={
