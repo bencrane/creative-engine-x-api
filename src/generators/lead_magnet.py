@@ -189,6 +189,20 @@ class LeadMagnetGenerator(BaseGenerator):
         elif industry:
             parts.append(f"INDUSTRY CONTEXT: {industry} — tailor examples and language accordingly.")
 
+        # Source content — restructure mode
+        if content_props.get("source_content"):
+            source_text = content_props["source_content"]
+            if len(source_text) > 32_000:
+                source_text = source_text[:32_000] + "\n[...truncated]"
+            parts.append(
+                "SOURCE CONTENT TO RESTRUCTURE:\n"
+                "The following source material should be restructured into the format above. "
+                "Extract key insights, reorganize the information to match the target format's "
+                "structure, and rewrite in a professional B2B tone. Do NOT copy verbatim — "
+                "synthesize and restructure.\n\n"
+                + source_text
+            )
+
         # Topic
         if content_props.get("topic"):
             parts.append(f"TOPIC: {content_props['topic']}")

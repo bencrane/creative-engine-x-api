@@ -334,6 +334,21 @@ content_props_schema:
         type: string
       description: "Optional list of specific angles, claims, or talking points to include."
       nullable: true
+    source_content:
+      type: string
+      description: >
+        Raw text to restructure into the selected format. When provided,
+        the generator restructures this content rather than generating
+        from scratch. Topic, target_audience, and key_points still guide
+        framing and structure.
+      nullable: true
+    source_url:
+      type: string
+      description: >
+        YouTube video URL. Transcript is extracted automatically and used
+        as source_content. If both source_url and source_content are
+        provided, source_content takes precedence.
+      nullable: true
   required: [format, topic, target_audience]
 
 # ─────────────────────────────────────────────────────────────────────────────
