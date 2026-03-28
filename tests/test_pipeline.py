@@ -217,6 +217,51 @@ class TestSyncPipeline:
 # Async pipeline integration tests
 # ---------------------------------------------------------------------------
 
+class TestSourceUrlPreprocessing:
+    @pytest.mark.asyncio
+    async def test_source_content_takes_precedence_over_source_url(self):
+        """When both source_content and source_url are provided, source_content wins."""
+        from src.pipeline.orchestrator import _preprocess_source_url
+        props = {
+            "source_content": "Already provided",
+            "source_url": "https://youtu.be/dQw4w9WgXcQ",
+        }
+        result = await _preprocess_source_url(props)
+        assert result["source_content"] == "Already provided"
+
+    @pytest.mark.asyncio
+    async def test_no_source_url_returns_props_unchanged(self):
+        from src.pipeline.orchestrator import _preprocess_source_url
+        props = {"format": "checklist", "topic": "Test"}
+        result = await _preprocess_source_url(props)
+        assert result == props
+
+    @pytest.mark.asyncio
+    async def test_source_url_extracts_transcript(self):
+        from src.pipeline.orchestrator import _preprocess_source_url
+        with patch("src.extractors.youtube.extract_transcript", new_callable=AsyncMock) as mock_extract:
+            mock_extract.return_value = "Extracted transcript text"
+            props = {
+                "format": "checklist",
+                "topic": "Test",
+                "source_url": "https://youtu.be/dQw4w9WgXcQ",
+            }
+            result = await _preprocess_source_url(props)
+        mock_extract.assert_called_once_with("https://youtu.be/dQw4w9WgXcQ")
+        assert result["source_content"] == "Extracted transcript text"
+        assert result["source_url"] == "https://youtu.be/dQw4w9WgXcQ"  # preserved
+
+    @pytest.mark.asyncio
+    async def test_source_url_does_not_mutate_original(self):
+        from src.pipeline.orchestrator import _preprocess_source_url
+        with patch("src.extractors.youtube.extract_transcript", new_callable=AsyncMock) as mock_extract:
+            mock_extract.return_value = "Transcript"
+            original = {"source_url": "https://youtu.be/dQw4w9WgXcQ"}
+            result = await _preprocess_source_url(original)
+        assert "source_content" not in original
+        assert "source_content" in result
+
+
 class TestAsyncPipeline:
     @pytest.mark.asyncio
     @patch("src.pipeline.orchestrator.get_pool")

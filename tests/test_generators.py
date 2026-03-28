@@ -290,6 +290,74 @@ class TestLeadMagnetGenerator:
         assert client.generate.call_count == 2  # two passes
         assert result.metadata.get("two_pass") is True
 
+    def test_source_content_injected_into_instructions(self):
+        from src.generators.lead_magnet import LeadMagnetGenerator
+        gen = LeadMagnetGenerator()
+        instructions = gen.build_asset_specific_instructions(
+            {
+                "format": "checklist",
+                "topic": "DevOps Automation",
+                "target_audience": "Platform engineers",
+                "source_content": "This is raw transcript text about CI/CD pipelines...",
+            },
+            _brand_context(),
+            _spec(spec_id="pdf__generic", artifact_type="pdf", surface="generic"),
+        )
+        assert "SOURCE CONTENT TO RESTRUCTURE" in instructions
+        assert "CI/CD pipelines" in instructions
+        assert "DevOps Automation" in instructions  # topic still present
+
+    def test_source_content_truncated_if_too_long(self):
+        from src.generators.lead_magnet import LeadMagnetGenerator
+        gen = LeadMagnetGenerator()
+        long_content = "word " * 10_000  # ~50K chars
+        instructions = gen.build_asset_specific_instructions(
+            {
+                "format": "checklist",
+                "topic": "Test",
+                "target_audience": "Engineers",
+                "source_content": long_content,
+            },
+            _brand_context(),
+            _spec(spec_id="pdf__generic", artifact_type="pdf", surface="generic"),
+        )
+        assert "[...truncated]" in instructions
+
+    async def test_generate_single_pass_with_source_content(self):
+        from src.generators.lead_magnet import LeadMagnetGenerator
+        gen = LeadMagnetGenerator()
+        content = {
+            "title": "Restructured Guide",
+            "subtitle": "From Video",
+            "sections": [{"heading": "Intro", "body": "Content", "bullets": [], "callout_box": None}],
+        }
+        client = _mock_client(content)
+        spec = _spec(spec_id="pdf__generic", artifact_type="pdf", surface="generic")
+        result = await gen.generate(
+            {"format": "checklist", "source_content": "Some raw text to restructure"},
+            _brand_context(), spec, client,
+        )
+        assert isinstance(result, GeneratedContent)
+        client.generate.assert_called_once()
+
+    async def test_generate_two_pass_with_source_content(self):
+        from src.generators.lead_magnet import LeadMagnetGenerator
+        gen = LeadMagnetGenerator()
+        content = {
+            "title": "Guide from Transcript",
+            "subtitle": "Subtitle",
+            "sections": [{"heading": "Ch1", "body": "Content", "bullets": [], "callout_box": None}],
+        }
+        client = _mock_client(content)
+        spec = _spec(spec_id="pdf__generic", artifact_type="pdf", surface="generic")
+        result = await gen.generate(
+            {"format": "ultimate_guide", "source_content": "Transcript text here..."},
+            _brand_context(), spec, client,
+        )
+        assert isinstance(result, GeneratedContent)
+        assert client.generate.call_count == 2
+        assert result.metadata.get("two_pass") is True
+
 
 # ============================================================================
 # CEX-17: Landing Page Generator

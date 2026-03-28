@@ -42,6 +42,9 @@ async def run_sync_pipeline(
     claude_client = ClaudeClient()
     generator = generator_cls()
 
+    # 2.5 Pre-process: extract source_content from source_url if provided
+    content_props = await _preprocess_source_url(content_props)
+
     # 3. Generate content via Claude
     generated = await generator.generate(
         content_props=content_props,
@@ -213,6 +216,9 @@ async def execute_async_job(job_id: str) -> None:
 
         await job_service.update_status(job_id, status="rendering", progress=0.2)
 
+        # Pre-process: extract source_content from source_url if provided
+        content_props = await _preprocess_source_url(content_props)
+
         # Generate
         generated = await generator.generate(
             content_props=content_props,
@@ -294,3 +300,19 @@ async def execute_async_job(job_id: str) -> None:
             await job_service.fail_job(job_id, str(e))
         except Exception:
             logger.exception(f"Failed to mark job {job_id} as failed")
+
+
+async def _preprocess_source_url(content_props: dict) -> dict:
+    """If content_props contains source_url, extract transcript into source_content.
+
+    Returns a new dict with source_content populated.
+    If source_content is already set, source_url is ignored.
+    """
+    source_url = content_props.get("source_url")
+    if not source_url or content_props.get("source_content"):
+        return content_props
+
+    from src.extractors.youtube import extract_transcript
+
+    transcript = await extract_transcript(source_url)
+    return {**content_props, "source_content": transcript}
