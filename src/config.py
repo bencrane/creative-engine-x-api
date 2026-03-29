@@ -29,7 +29,6 @@ class Settings(BaseSettings):
 
     # Auth
     api_key_salt: str = ""
-    jwt_secret: str = ""
 
     # Optional
     lob_api_key: str = ""

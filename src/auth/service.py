@@ -4,11 +4,17 @@ import uuid
 from datetime import datetime, timezone
 
 import bcrypt
-from jose import JWTError, jwt
+import jwt
+from jwt import PyJWKClient
 
 from src.auth.models import APIKeyRecord, Organization
-from src.config import settings
 from src.shared.errors import AuthenticationError
+
+_jwks_client = PyJWKClient(
+    "https://api.authengine.dev/api/auth/jwks",
+    cache_jwk_set=True,
+    lifespan=300,
+)
 
 
 async def verify_api_key(key: str, pool) -> APIKeyRecord:
@@ -41,15 +47,23 @@ async def verify_api_key(key: str, pool) -> APIKeyRecord:
 
 def verify_jwt(token: str) -> dict:
     """Verify a JWT and return the claims."""
-    if not settings.jwt_secret:
-        raise AuthenticationError("JWT authentication not configured")
     try:
-        payload = jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
-    except JWTError as e:
-        raise AuthenticationError(f"Invalid JWT: {e}")
-    if "organization_id" not in payload:
-        raise AuthenticationError("JWT missing organization_id claim")
-    return payload
+        signing_key = _jwks_client.get_signing_key_from_jwt(token)
+        payload = jwt.decode(
+            token,
+            signing_key,
+            algorithms=["EdDSA"],
+            issuer="https://api.authengine.dev",
+            audience="https://api.authengine.dev",
+            options={"require": ["exp", "sub", "org_id"]},
+        )
+        # Map org_id to organization_id for CEX's internal convention
+        payload["organization_id"] = payload["org_id"]
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationError("Token has expired")
+    except jwt.PyJWTError as exc:
+        raise AuthenticationError(f"Invalid token: {exc}")
 
 
 async def resolve_organization(org_id: str, pool) -> Organization:

@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 
 from src.auth.service import resolve_organization, verify_api_key, verify_jwt
 from src.db import get_pool
@@ -20,8 +21,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
         try:
             pool = await get_pool()
         except RuntimeError:
-            # No DB pool — allow request through (e.g., testing)
-            return await call_next(request)
+            response = JSONResponse(
+                {"error": "service_unavailable", "message": "Database not ready"},
+                status_code=503,
+            )
+            return response
 
         api_key_header = request.headers.get("X-API-Key")
         auth_header = request.headers.get("Authorization")
